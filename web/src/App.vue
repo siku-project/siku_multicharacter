@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import BoilerplateView from './views/BoilerplateView.vue'
+import { defineAsyncComponent } from 'vue'
 
-const isDevelopment = import.meta.env.DEV
+const BoilerplateView = import.meta.env.DEV
+  ? defineAsyncComponent(() => import('./views/BoilerplateView.vue'))
+  : null
 </script>
 
 <template>
   <VApp>
-    <BoilerplateView v-if="isDevelopment" />
-    <RouterView v-if="!isDevelopment" />
+    <component :is="BoilerplateView" v-if="BoilerplateView" />
+    <RouterView v-else />
   </VApp>
 </template>
