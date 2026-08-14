@@ -18,7 +18,7 @@
     "check": "bun run format && bun run type-check && bun run lint"
   },
   "dependencies": {
-    "@mdi/font": "^7.4.47",
+    "@mdi/js": "^7.4.47",
     "axios": "^1.19.0",
     "pinia": "^4.0.2",
     "vue": "^3.5.40",
