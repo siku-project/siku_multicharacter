@@ -11,17 +11,18 @@ lua54 'yes'
 
 shared_scripts {
   '@siku_core/init.lua',
-  'config/translation.lua',
+  'config/*.lua',
   'shared/utils/locale.lua',
 }
 
 server_scripts {
+  '@oxmysql/lib/MySQL.lua',
   'server/init.lua',
-  'server/main.lua',
+  'server/modules/**/*.lua',
 }
 
 client_scripts {
-  'client/main.lua',
+  'client/modules/**/*.lua',
 }
 
 ui_page 'web/dist/index.html'
@@ -33,4 +34,5 @@ files {
 
 dependencies {
   'siku_core',
+  'oxmysql',
 }

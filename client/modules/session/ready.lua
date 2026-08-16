@@ -8,14 +8,14 @@ local function announceReady()
   end
   hasAnnounced = true
 
-    TriggerServerEvent('siku_multicharacter:server:playerReady')
+  TriggerServerEvent('siku_multicharacter:server:playerReady')
   Siku.print.debug("Event Sent to server !")
 end
 
 CreateThread(function()
   Siku.WaitFor(function()
-    return NetworkIsSessionStarted() or nil
-  end, 'network session never started', false)
+    return NetworkIsPlayerActive(PlayerId()) or nil
+  end, T('error_session_never_started'), false)
 
   Siku.print.debug("Session detected and player arrived !")
   announceReady()
