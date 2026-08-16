@@ -35,7 +35,7 @@ withDefaults(
   border-radius: 1.25rem;
   border: 1px solid rgba(212, 231, 247, 0.14);
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='130' height='130' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E"),
+    var(--ice-noise),
     radial-gradient(
       150% 100% at 50% -25%,
       rgba(203, 227, 246, var(--ice-glow)) 0%,
