@@ -8,11 +8,37 @@ import CategoryCard from '@/components/appearance/CategoryCard.vue'
 import CategoryDetail from '@/components/appearance/CategoryDetail.vue'
 import OptionSelect from '@/components/appearance/controls/OptionSelect.vue'
 import SummaryStep from '@/components/appearance/steps/SummaryStep.vue'
+import { storeToRefs } from 'pinia'
 import { resolveIcon } from '@/utils/icons'
-import { APPEARANCE_STEPS, PED_MODELS, createAppearanceDraft } from '@/config/appearance'
-import type { AppearanceStepDefinition } from '@/config/appearance'
+import { sendNuiCallback } from '@/utils/nui'
+import { useMulticharacterStore } from '@/stores/multicharacter'
+import { APPEARANCE_STEPS, createAppearanceDraft } from '@/config/appearance'
+import type { AppearanceStepDefinition, PedModel } from '@/config/appearance'
 
 const { t } = useI18n()
+
+const BASIC_PED_LABELS: Record<string, string> = {
+  mp_m_freemode_01: 'appearance.pedMale',
+  mp_f_freemode_01: 'appearance.pedFemale',
+}
+
+const { pedsConfig } = storeToRefs(useMulticharacterStore())
+
+const availablePeds = computed<PedModel[]>(() => {
+  const models: PedModel[] = pedsConfig.value.basics.map((id) => ({
+    id,
+    labelKey: BASIC_PED_LABELS[id],
+    name: id,
+  }))
+
+  if (pedsConfig.value.authorizeAll) {
+    for (const id of pedsConfig.value.peds) {
+      models.push({ id, name: id })
+    }
+  }
+
+  return models
+})
 
 const currentIndex = ref(0)
 const furthestIndex = ref(0)
@@ -49,16 +75,22 @@ const selectCategory = (id: string): void => {
 }
 
 const pedOptions = computed(() =>
-  PED_MODELS.map((model) => ({
+  availablePeds.value.map((model) => ({
     label: model.labelKey ? t(model.labelKey) : (model.name ?? model.id),
     mono: model.id,
   })),
 )
 
-const pedIndex = computed(() => PED_MODELS.findIndex((model) => model.id === pedModel.value))
+const pedIndex = computed(() =>
+  availablePeds.value.findIndex((model) => model.id === pedModel.value),
+)
 
 const handlePedSelect = (index: number): void => {
-  pedModel.value = PED_MODELS[index]?.id ?? ''
+  pedModel.value = availablePeds.value[index]?.id ?? ''
+
+  if (pedModel.value) {
+    void sendNuiCallback('siku_multicharacter:nui:pedSelected', { model: pedModel.value })
+  }
 }
 
 const handleUpdate = (key: string, value: number): void => {

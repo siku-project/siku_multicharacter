@@ -23,5 +23,15 @@ RegisterNUICallback('siku_multicharacter:nui:ready', function(_, cb)
       translations = loadTranslations(),
     },
   })
+
+  SendNUIMessage({
+    action = 'siku_multicharacter:nui:setPeds',
+    peds = {
+      authorizeAll = PedsConfig.authorizePedwhileInCreator,
+      basics = PedsConfig.pedList.basics,
+      peds = PedsConfig.pedList.peds,
+    },
+  })
+
   cb({})
 end)

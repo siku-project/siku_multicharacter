@@ -1,12 +1,16 @@
 local identityDraft = nil
 local sceneCamera = nil
 
---- Swaps the player to the freemode model matching the chosen gender and
---- restages them with the configured default look.
----@param gender string 'm' for male, 'f' for female.
+local FREEMODE_GENDERS <const> = {
+  mp_m_freemode_01 = 'm',
+  mp_f_freemode_01 = 'f',
+}
+
+--- Swaps the player to a model and restages them at the staging spot,
+--- with the configured default look when the model is a freemode one.
+---@param model string The ped model name.
 ---@return number ped The restaged ped handle.
-local function stageDefaultCharacter(gender)
-  local model <const> = gender == 'f' and 'mp_f_freemode_01' or 'mp_m_freemode_01'
+local function restagePlayer(model)
   local modelHash <const> = Siku.RequestModel(model)
 
   SetPlayerModel(PlayerId(), modelHash)
@@ -20,7 +24,11 @@ local function stageDefaultCharacter(gender)
   FreezeEntityPosition(ped, true)
   SetPlayerControl(PlayerId(), false, 0)
 
-  ApplyDefaultCharacter(ped, gender)
+  local gender <const> = FREEMODE_GENDERS[model]
+
+  if gender then
+    ApplyDefaultCharacter(ped, gender)
+  end
 
   return ped
 end
@@ -108,12 +116,31 @@ RegisterNUICallback('siku_multicharacter:nui:identitySubmitted', function(data, 
     SendNUIMessage({ action = 'siku_multicharacter:nui:setScreen', screen = 'hidden' })
     SetNuiFocus(false, false)
 
-    local gender <const> = data.gender == 'female' and 'f' or 'm'
-    local ped <const> = stageDefaultCharacter(gender)
+    local model <const> = data.gender == 'female' and 'mp_f_freemode_01' or 'mp_m_freemode_01'
+    local ped <const> = restagePlayer(model)
 
     playIntroCamera(ped)
+    SetEntityVisible(ped, false, false)
 
     SetNuiFocus(true, true)
     SendNUIMessage({ action = 'siku_multicharacter:nui:setScreen', screen = 'appearance' })
+  end)
+end)
+
+RegisterNUICallback('siku_multicharacter:nui:pedSelected', function(data, cb)
+  cb({})
+
+  if type(data) ~= 'table' or type(data.model) ~= 'string' then
+    return
+  end
+
+  CreateThread(function()
+    local ped <const> = restagePlayer(data.model)
+
+    SetEntityVisible(ped, true, false)
+
+    if sceneCamera then
+      Siku.camera.pointAtBone(sceneCamera, ped, 31086)
+    end
   end)
 end)

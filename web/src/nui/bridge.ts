@@ -5,11 +5,25 @@ import {
 } from '@/stores/multicharacter'
 import { applyLocale, isLocalePayload } from '@/utils/locale'
 import { sendNuiCallback } from '@/utils/nui'
+import type { PedsConfig } from '@/utils/multicharacter'
 
 interface NuiMessage {
   action?: unknown
   screen?: unknown
   locale?: unknown
+  peds?: unknown
+}
+
+const isPedsConfig = (value: unknown): value is PedsConfig => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+  const config = value as Partial<PedsConfig>
+  return (
+    typeof config.authorizeAll === 'boolean' &&
+    Array.isArray(config.basics) &&
+    Array.isArray(config.peds)
+  )
 }
 
 const isScreen = (value: unknown): value is MulticharacterScreen =>
@@ -36,6 +50,11 @@ export const initNuiBridge = (): void => {
 
     if (data.action === 'siku_multicharacter:nui:setLocale' && isLocalePayload(data.locale)) {
       applyLocale(data.locale)
+      return
+    }
+
+    if (data.action === 'siku_multicharacter:nui:setPeds' && isPedsConfig(data.peds)) {
+      store.setPedsConfig(data.peds)
     }
   })
 
