@@ -3,20 +3,36 @@ game 'gta5'
 
 author 'Siku Studio'
 description 'The official multicharacter system of the SIKU ecosystem — a modern, modular and immersive resource for creating, managing, and selecting player characters with seamless integration and a polished user experience.'
-version '0.0.1'
+version '0.1.0'
 
 name 'siku_multicharacter'
 
 lua54 'yes'
 
-shared_scripts {}
+shared_scripts {
+  '@siku_core/init.lua',
+  'config/*.lua',
+  'shared/utils/locale.lua',
+}
 
-server_scripts {}
+server_scripts {
+  '@oxmysql/lib/MySQL.lua',
+  'server/init.lua',
+  'server/modules/**/*.lua',
+}
 
-client_scripts {}
+client_scripts {
+  'client/modules/**/*.lua',
+}
 
-ui_page ''
+ui_page 'web/dist/index.html'
 
-files {}
+files {
+  'translations/*.lua',
+  'web/dist/**/*',
+}
 
-dependencies {}
+dependencies {
+  'siku_core',
+  'oxmysql',
+}
