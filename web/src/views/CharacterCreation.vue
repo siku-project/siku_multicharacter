@@ -3,13 +3,14 @@ import IceBackdrop from '@/components/ui/IceBackdrop.vue'
 import MusicPlayer from '@/components/ui/MusicPlayer.vue'
 import IdentityForm from '@/components/creation/IdentityForm.vue'
 import { useMulticharacterStore } from '@/stores/multicharacter'
+import { sendNuiCallback } from '@/utils/nui'
 import type { IdentityDraft } from '@/utils/identity'
 
 const store = useMulticharacterStore()
 
 const handleSubmit = (draft: IdentityDraft): void => {
   store.setIdentity(draft)
-  console.log('[siku_multicharacter] identity submitted', draft)
+  void sendNuiCallback('siku_multicharacter:nui:identitySubmitted', draft)
 }
 </script>
 
