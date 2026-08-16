@@ -16,7 +16,6 @@ local function loadTranslations()
 end
 
 RegisterNUICallback('siku_multicharacter:nui:ready', function(_, cb)
-  Siku.print.debug('NUI ready, sending locale')
   SendNUIMessage({
     action = 'siku_multicharacter:nui:setLocale',
     locale = {
