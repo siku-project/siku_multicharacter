@@ -33,9 +33,8 @@ end
 local function playIntroCamera(ped)
   local staging <const> = SpawnConfig.characterSelectionSpawn
   local base <const> = vector3(staging.x, staging.y, staging.z)
-  local radians <const> = math.rad(staging.w)
-  local forward <const> = vector3(-math.sin(radians), math.cos(radians), 0.0)
-  local right <const> = vector3(math.cos(radians), math.sin(radians), 0.0)
+  local forward <const> = GetEntityForwardVector(ped)
+  local right <const> = vector3(forward.y, -forward.x, 0.0)
   local focus <const> = base + vector3(0.0, 0.0, 0.6)
 
   local points <const> = {
@@ -58,8 +57,6 @@ local function playIntroCamera(ped)
 
   local splineCamera <const> = Siku.camera.createSpline({
     nodes = nodes,
-    duration = 7400,
-    smoothingStyle = 3,
     fov = 45.0,
   })
 
@@ -67,11 +64,21 @@ local function playIntroCamera(ped)
   Siku.camera.render(splineCamera)
   DoScreenFadeIn(1000)
 
-  local deadline <const> = GetGameTimer() + 10000
+  local duration <const> = 7400
+  local start <const> = GetGameTimer()
 
-  while Siku.camera.getSplinePhase(splineCamera) < 1.0 and GetGameTimer() < deadline do
-    Wait(50)
+  while true do
+    local progress <const> = (GetGameTimer() - start) / duration
+
+    if progress >= 1.0 then
+      break
+    end
+
+    Siku.camera.setSplinePhase(splineCamera, progress * progress * (3.0 - 2.0 * progress))
+    Wait(0)
   end
+
+  Siku.camera.setSplinePhase(splineCamera, 1.0)
 
   local coords <const>, rotation <const>, fov <const> = Siku.camera.getTransform(splineCamera)
 
