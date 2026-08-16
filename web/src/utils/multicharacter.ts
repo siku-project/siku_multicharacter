@@ -34,6 +34,12 @@ export interface SelectionConfig {
   showDirtyMoney: boolean
 }
 
+export interface PedsConfig {
+  authorizeAll: boolean
+  basics: string[]
+  peds: string[]
+}
+
 const MONEY_FORMAT = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
