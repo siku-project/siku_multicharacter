@@ -29,7 +29,6 @@ ui_page 'web/dist/index.html'
 
 files {
   'translations/*.lua',
-  'web/dist/index.html',
   'web/dist/**/*',
 }
 
