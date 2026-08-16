@@ -25,9 +25,9 @@ local function stageDefaultCharacter(gender)
   return ped
 end
 
---- Plays the creation intro: the camera dives from the sky, closes in
---- from behind, circles the character while facing them, then settles a
---- few meters in front.
+--- Plays the creation intro as a single continuous spline shot: the
+--- camera dives from the sky, closes in from behind, circles the
+--- character while facing them, then settles in front, slightly above.
 ---@param ped number The ped handle.
 ---@return nil
 local function playIntroCamera(ped)
@@ -36,27 +36,49 @@ local function playIntroCamera(ped)
   local radians <const> = math.rad(staging.w)
   local forward <const> = vector3(-math.sin(radians), math.cos(radians), 0.0)
   local right <const> = vector3(math.cos(radians), math.sin(radians), 0.0)
+  local focus <const> = base + vector3(0.0, 0.0, 0.6)
 
-  sceneCamera = Siku.camera.create({
-    coords = base - forward * 45.0 + vector3(0.0, 0.0, 60.0),
+  local points <const> = {
+    { coords = base - forward * 45.0 + vector3(0.0, 0.0, 60.0), duration = 0 },
+    { coords = base - forward * 12.0 + vector3(0.0, 0.0, 4.0), duration = 2400 },
+    { coords = base - forward * 4.5 + vector3(0.0, 0.0, 2.0), duration = 1800 },
+    { coords = base + right * 3.4 + vector3(0.0, 0.0, 1.7), duration = 1600 },
+    { coords = base + forward * 2.8 + vector3(0.0, 0.0, 1.6), duration = 1600 },
+  }
+
+  local nodes <const> = {}
+
+  for i = 1, #points do
+    nodes[i] = {
+      coords = points[i].coords,
+      rotation = Siku.camera.rotationTo(points[i].coords, focus),
+      duration = points[i].duration,
+    }
+  end
+
+  local splineCamera <const> = Siku.camera.createSpline({
+    nodes = nodes,
+    duration = 7400,
+    smoothingStyle = 3,
     fov = 45.0,
   })
 
-  Siku.camera.pointAtBone(sceneCamera, ped, 31086)
-  Siku.camera.render(sceneCamera)
+  Siku.camera.pointAtBone(splineCamera, ped, 31086)
+  Siku.camera.render(splineCamera)
   DoScreenFadeIn(1000)
 
-  Siku.camera.moveTo(sceneCamera, { coords = base - forward * 12.0 + vector3(0.0, 0.0, 4.0) }, 2200, 'easeIn')
-  Wait(2200)
+  local deadline <const> = GetGameTimer() + 10000
 
-  Siku.camera.moveTo(sceneCamera, { coords = base - forward * 4.0 + vector3(0.0, 0.0, 1.4) }, 1600, 'easeOut')
-  Wait(1600)
+  while Siku.camera.getSplinePhase(splineCamera) < 1.0 and GetGameTimer() < deadline do
+    Wait(50)
+  end
 
-  Siku.camera.moveTo(sceneCamera, { coords = base + right * 3.2 + vector3(0.0, 0.0, 0.9) }, 1400, 'linear')
-  Wait(1400)
+  local coords <const>, rotation <const>, fov <const> = Siku.camera.getTransform(splineCamera)
 
-  Siku.camera.moveTo(sceneCamera, { coords = base + forward * 2.6 + vector3(0.0, 0.0, 0.7) }, 1500, 'easeOut')
-  Wait(1500)
+  sceneCamera = Siku.camera.create({ coords = coords, rotation = rotation, fov = fov })
+  Siku.camera.pointAtBone(sceneCamera, ped, 31086)
+  Siku.camera.render(sceneCamera)
+  Siku.camera.destroy(splineCamera)
 end
 
 --- Gets the camera used by the creation scene.
