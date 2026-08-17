@@ -64,7 +64,7 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
   }
 
   const setAppearanceLimits = (next: Record<string, number>): void => {
-    appearanceLimits.value = next
+    appearanceLimits.value = { ...appearanceLimits.value, ...next }
   }
 
   return {

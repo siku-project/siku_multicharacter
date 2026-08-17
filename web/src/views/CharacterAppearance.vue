@@ -16,6 +16,9 @@ import { useMulticharacterStore } from '@/stores/multicharacter'
 import { APPEARANCE_STEPS, controlKey, createAppearanceDraft } from '@/config/appearance'
 import type { AppearanceCategory, AppearanceStepDefinition, PedModel } from '@/config/appearance'
 import { buildPhysicalPayload } from '@/utils/physical'
+import { CLOTHING_CATEGORIES, buildClothingPayload } from '@/utils/clothing'
+import { ACCESSORY_CATEGORIES, buildAccessoryPayload } from '@/utils/accessories'
+import { TATTOO_ZONES, buildTattooPayload } from '@/utils/tattoos'
 
 const { t } = useI18n()
 
@@ -27,6 +30,21 @@ const BASIC_PED_LABELS: Record<string, string> = {
 const { pedsConfig, heritageConfig, appearanceLimits } = storeToRefs(useMulticharacterStore())
 
 const LIMIT_BINDINGS: Record<string, string> = {
+  ...Object.fromEntries(
+    CLOTHING_CATEGORIES.flatMap((category) => [
+      [controlKey('clothing', category, 'model'), `${category}Model`],
+      [controlKey('clothing', category, 'variant'), `${category}Variant`],
+    ]),
+  ),
+  ...Object.fromEntries(
+    ACCESSORY_CATEGORIES.flatMap((category) => [
+      [controlKey('accessories', category, 'model'), `${category}Model`],
+      [controlKey('accessories', category, 'variant'), `${category}Variant`],
+    ]),
+  ),
+  ...Object.fromEntries(
+    TATTOO_ZONES.map((zone) => [controlKey('tattoos', zone, 'tattoo'), `${zone}Tattoo`]),
+  ),
   [controlKey('physical', 'hair', 'style')]: 'hairStyles',
   [controlKey('physical', 'eyebrows', 'shape')]: 'eyebrows',
   [controlKey('physical', 'beard', 'style')]: 'beard',
@@ -77,14 +95,14 @@ const detailCategory = computed(() =>
 const resolvedDetailCategory = computed<AppearanceCategory | undefined>(() => {
   const category = detailCategory.value
 
-  if (!category || currentStep.value.id !== 'physical') {
+  if (!category) {
     return category
   }
 
   return {
     ...category,
     controls: category.controls.map((control) => {
-      const limitKey = LIMIT_BINDINGS[controlKey('physical', category.id, control.id)]
+      const limitKey = LIMIT_BINDINGS[controlKey(currentStep.value.id, category.id, control.id)]
       const limit = limitKey ? appearanceLimits.value[limitKey] : undefined
 
       if (!limit || limit <= 0) {
@@ -157,6 +175,24 @@ const physicalPayload = computed(() => buildPhysicalPayload(draft))
 
 watch(physicalPayload, (payload) => {
   void sendNuiCallback('siku_multicharacter:nui:physicalChanged', payload)
+})
+
+const clothingPayload = computed(() => buildClothingPayload(draft))
+
+watch(clothingPayload, (payload) => {
+  void sendNuiCallback('siku_multicharacter:nui:clothingChanged', payload)
+})
+
+const accessoryPayload = computed(() => buildAccessoryPayload(draft))
+
+watch(accessoryPayload, (payload) => {
+  void sendNuiCallback('siku_multicharacter:nui:accessoriesChanged', payload)
+})
+
+const tattooPayload = computed(() => buildTattooPayload(draft))
+
+watch(tattooPayload, (payload) => {
+  void sendNuiCallback('siku_multicharacter:nui:tattoosChanged', payload)
 })
 
 const UI_ZONE_RATIO = 0.4

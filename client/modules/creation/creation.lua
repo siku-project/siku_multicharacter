@@ -31,6 +31,10 @@ local function restagePlayer(model)
     SendAppearanceLimits(ped)
   end
 
+  SendClothingLimits(ped)
+  SendAccessoryLimits(ped)
+  SendTattooLimits(ped)
+
   return ped
 end
 
