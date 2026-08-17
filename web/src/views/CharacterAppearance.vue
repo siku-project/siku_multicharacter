@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import IcePanel from '@/components/ui/IcePanel.vue'
 import IceButton from '@/components/ui/IceButton.vue'
+import CameraTips from '@/components/appearance/CameraTips.vue'
 import StepTabs from '@/components/appearance/StepTabs.vue'
 import CategoryCard from '@/components/appearance/CategoryCard.vue'
 import CategoryDetail from '@/components/appearance/CategoryDetail.vue'
@@ -12,7 +13,7 @@ import { storeToRefs } from 'pinia'
 import { resolveIcon } from '@/utils/icons'
 import { sendNuiCallback } from '@/utils/nui'
 import { useMulticharacterStore } from '@/stores/multicharacter'
-import { APPEARANCE_STEPS, createAppearanceDraft } from '@/config/appearance'
+import { APPEARANCE_STEPS, controlKey, createAppearanceDraft } from '@/config/appearance'
 import type { AppearanceStepDefinition, PedModel } from '@/config/appearance'
 
 const { t } = useI18n()
@@ -22,7 +23,7 @@ const BASIC_PED_LABELS: Record<string, string> = {
   mp_f_freemode_01: 'appearance.pedFemale',
 }
 
-const { pedsConfig } = storeToRefs(useMulticharacterStore())
+const { pedsConfig, heritageConfig } = storeToRefs(useMulticharacterStore())
 
 const availablePeds = computed<PedModel[]>(() => {
   const models: PedModel[] = pedsConfig.value.basics.map((id) => ({
@@ -97,6 +98,106 @@ const handleUpdate = (key: string, value: number): void => {
   draft[key] = value
 }
 
+const heritagePayload = computed(() => {
+  const mother =
+    heritageConfig.value.mothers[draft[controlKey('heritage', 'parents', 'mother')] ?? 0]
+  const father =
+    heritageConfig.value.fathers[draft[controlKey('heritage', 'parents', 'father')] ?? 0]
+
+  return {
+    mother: mother?.id ?? 21,
+    father: father?.id ?? 0,
+    resemblance: (draft[controlKey('heritage', 'resemblance', 'resemblance')] ?? 50) / 100,
+    skinTone: (draft[controlKey('heritage', 'resemblance', 'skinTone')] ?? 50) / 100,
+  }
+})
+
+watch(heritagePayload, (payload) => {
+  void sendNuiCallback('siku_multicharacter:nui:heritageChanged', payload)
+})
+
+const UI_ZONE_RATIO = 0.4
+
+const cameraControlsActive = computed(() => currentStep.value.id !== 'ped')
+
+let leftHeld = false
+let rightHeld = false
+
+const isInsideUiZone = (event: MouseEvent): boolean =>
+  event.clientX < window.innerWidth * UI_ZONE_RATIO
+
+const handleMouseDown = (event: MouseEvent): void => {
+  if (!cameraControlsActive.value || isInsideUiZone(event)) {
+    return
+  }
+
+  if (event.button === 0) {
+    leftHeld = true
+    void sendNuiCallback('siku_multicharacter:nui:cameraControlStart', { type: 'pan' })
+  } else if (event.button === 2) {
+    rightHeld = true
+    void sendNuiCallback('siku_multicharacter:nui:cameraControlStart', { type: 'rotate' })
+  }
+}
+
+const handleMouseUp = (event: MouseEvent): void => {
+  if (event.button === 0 && leftHeld) {
+    leftHeld = false
+    void sendNuiCallback('siku_multicharacter:nui:cameraControlStop', { type: 'pan' })
+  } else if (event.button === 2 && rightHeld) {
+    rightHeld = false
+    void sendNuiCallback('siku_multicharacter:nui:cameraControlStop', { type: 'rotate' })
+  }
+}
+
+const handleMouseMove = (event: MouseEvent): void => {
+  if (!leftHeld && !rightHeld) {
+    return
+  }
+
+  void sendNuiCallback('siku_multicharacter:nui:cameraControlMove', {
+    type: leftHeld ? 'pan' : 'rotate',
+    movementX: event.movementX,
+    movementY: event.movementY,
+  })
+}
+
+const handleWheel = (event: WheelEvent): void => {
+  if (!cameraControlsActive.value || isInsideUiZone(event)) {
+    return
+  }
+
+  event.preventDefault()
+
+  void sendNuiCallback('siku_multicharacter:nui:cameraZoom', {
+    zoomIn: event.deltaY < 0,
+    mouseX: event.clientX / window.innerWidth,
+    mouseY: event.clientY / window.innerHeight,
+  })
+}
+
+const handleContextMenu = (event: MouseEvent): void => {
+  if (!isInsideUiZone(event)) {
+    event.preventDefault()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('mousedown', handleMouseDown)
+  document.addEventListener('mouseup', handleMouseUp)
+  document.addEventListener('mousemove', handleMouseMove)
+  document.addEventListener('wheel', handleWheel, { passive: false })
+  document.addEventListener('contextmenu', handleContextMenu)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', handleMouseDown)
+  document.removeEventListener('mouseup', handleMouseUp)
+  document.removeEventListener('mousemove', handleMouseMove)
+  document.removeEventListener('wheel', handleWheel)
+  document.removeEventListener('contextmenu', handleContextMenu)
+})
+
 const goNext = (): void => {
   if (isLast.value) {
     console.log('[siku_multicharacter] appearance validated', {
@@ -113,6 +214,10 @@ const goNext = (): void => {
 <template>
   <div class="pointer-events-none fixed inset-0">
     <div class="scrim absolute inset-0" aria-hidden="true"></div>
+
+    <Transition name="head-pop" appear>
+      <CameraTips v-if="cameraControlsActive" />
+    </Transition>
 
     <div class="absolute inset-y-0 left-0 flex w-[880px] flex-col px-10 pb-8 pt-9">
       <Transition name="head-pop" appear>

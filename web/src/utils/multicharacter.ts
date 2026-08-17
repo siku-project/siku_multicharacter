@@ -40,6 +40,16 @@ export interface PedsConfig {
   peds: string[]
 }
 
+export interface HeritageParent {
+  id: number
+  name: string
+}
+
+export interface HeritageConfig {
+  fathers: HeritageParent[]
+  mothers: HeritageParent[]
+}
+
 const MONEY_FORMAT = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',

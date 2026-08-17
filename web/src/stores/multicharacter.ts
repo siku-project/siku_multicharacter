@@ -1,6 +1,11 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { CharacterSummary, PedsConfig, SelectionConfig } from '@/utils/multicharacter'
+import type {
+  CharacterSummary,
+  HeritageConfig,
+  PedsConfig,
+  SelectionConfig,
+} from '@/utils/multicharacter'
 import type { IdentityDraft } from '@/utils/identity'
 
 export const MULTICHARACTER_SCREENS = ['hidden', 'selection', 'creation', 'appearance'] as const
@@ -20,6 +25,10 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
     authorizeAll: false,
     basics: ['mp_m_freemode_01', 'mp_f_freemode_01'],
     peds: [],
+  })
+  const heritageConfig = ref<HeritageConfig>({
+    fathers: [],
+    mothers: [],
   })
 
   const setScreen = (next: MulticharacterScreen): void => {
@@ -49,17 +58,23 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
     pedsConfig.value = next
   }
 
+  const setHeritageConfig = (next: HeritageConfig): void => {
+    heritageConfig.value = next
+  }
+
   return {
     screen,
     characters,
     selectionConfig,
     identity,
     pedsConfig,
+    heritageConfig,
     setScreen,
     hide,
     setCharacters,
     setSelectionConfig,
     setIdentity,
     setPedsConfig,
+    setHeritageConfig,
   }
 })

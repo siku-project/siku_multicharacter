@@ -2,13 +2,7 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
-import {
-  APPEARANCE_STEPS,
-  FATHER_NAMES,
-  MOTHER_NAMES,
-  PED_MODELS,
-  controlKey,
-} from '@/config/appearance'
+import { APPEARANCE_STEPS, PED_MODELS, controlKey } from '@/config/appearance'
 import type { AppearanceCategory, AppearanceControl } from '@/config/appearance'
 import { useMulticharacterStore } from '@/stores/multicharacter'
 import { createIdentityDraft } from '@/utils/identity'
@@ -34,7 +28,7 @@ const props = defineProps<{
 
 const { t, locale } = useI18n()
 
-const { identity: storedIdentity } = storeToRefs(useMulticharacterStore())
+const { identity: storedIdentity, heritageConfig } = storeToRefs(useMulticharacterStore())
 
 const identity = computed(() => storedIdentity.value ?? createIdentityDraft())
 
@@ -118,8 +112,12 @@ const blendSplit = (value: number): string => {
 }
 
 const heritageRows = computed<SummaryRow[]>(() => {
-  const mother = MOTHER_NAMES[props.draft[controlKey('heritage', 'parents', 'mother')] ?? 0] ?? '—'
-  const father = FATHER_NAMES[props.draft[controlKey('heritage', 'parents', 'father')] ?? 0] ?? '—'
+  const mother =
+    heritageConfig.value.mothers[props.draft[controlKey('heritage', 'parents', 'mother')] ?? 0]
+      ?.name ?? '—'
+  const father =
+    heritageConfig.value.fathers[props.draft[controlKey('heritage', 'parents', 'father')] ?? 0]
+      ?.name ?? '—'
   const resemblance = props.draft[controlKey('heritage', 'resemblance', 'resemblance')] ?? 50
   const skinTone = props.draft[controlKey('heritage', 'resemblance', 'skinTone')] ?? 50
   return [
