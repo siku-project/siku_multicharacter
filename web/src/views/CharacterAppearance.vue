@@ -279,9 +279,9 @@ onBeforeUnmount(() => {
 
 const goNext = (): void => {
   if (isLast.value) {
-    console.log('[siku_multicharacter] appearance validated', {
+    void sendNuiCallback('siku_multicharacter:nui:appearanceValidated', {
       pedModel: pedModel.value,
-      draft: { ...draft },
+      appearance: { ...draft },
     })
     return
   }

@@ -7,6 +7,13 @@ return {
   error_no_license = 'No usable license for %s (%d).',
   error_account_create_failed = 'Failed to create user for %s (session %d).',
   error_screen_never_faded = 'The screen never faded to black.',
+  error_collision_never_loaded = 'Collisions never finished loading.',
+  error_missing_identity = 'Appearance validated without a stored identity.',
+  error_invalid_character_payload = 'Invalid character payload for session %d.',
+  error_no_user_for_character = 'No cached account for session %d.',
+  error_character_create_failed = 'Failed to create character %s (session %d).',
+  error_character_load_failed = 'Failed to load character %d (session %d).',
+  drop_character_create_failed = 'Failed to create your character. Please reconnect.',
 
   web = {
     ['selection.slot'] = 'Slot {number}',
