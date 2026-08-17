@@ -91,7 +91,6 @@ local function playIntroCamera(ped)
   local coords <const>, rotation <const>, fov <const> = Siku.camera.getTransform(splineCamera)
 
   sceneCamera = Siku.camera.create({ coords = coords, rotation = rotation, fov = fov })
-  Siku.camera.pointAtBone(sceneCamera, ped, 31086)
   Siku.camera.render(sceneCamera)
   Siku.camera.destroy(splineCamera)
 end
@@ -140,7 +139,7 @@ RegisterNUICallback('siku_multicharacter:nui:pedSelected', function(data, cb)
     SetEntityVisible(ped, true, false)
 
     if sceneCamera then
-      Siku.camera.pointAtBone(sceneCamera, ped, 31086)
+      Siku.camera.lookAt(sceneCamera, GetPedBoneCoords(ped, 31086, 0.0, 0.0, 0.0))
     end
   end)
 end)
