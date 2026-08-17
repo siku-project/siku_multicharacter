@@ -5,13 +5,22 @@ import {
 } from '@/stores/multicharacter'
 import { applyLocale, isLocalePayload } from '@/utils/locale'
 import { sendNuiCallback } from '@/utils/nui'
-import type { PedsConfig } from '@/utils/multicharacter'
+import type { HeritageConfig, PedsConfig } from '@/utils/multicharacter'
 
 interface NuiMessage {
   action?: unknown
   screen?: unknown
   locale?: unknown
   peds?: unknown
+  heritage?: unknown
+}
+
+const isHeritageConfig = (value: unknown): value is HeritageConfig => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+  const config = value as Partial<HeritageConfig>
+  return Array.isArray(config.fathers) && Array.isArray(config.mothers)
 }
 
 const isPedsConfig = (value: unknown): value is PedsConfig => {
@@ -55,6 +64,11 @@ export const initNuiBridge = (): void => {
 
     if (data.action === 'siku_multicharacter:nui:setPeds' && isPedsConfig(data.peds)) {
       store.setPedsConfig(data.peds)
+      return
+    }
+
+    if (data.action === 'siku_multicharacter:nui:setHeritage' && isHeritageConfig(data.heritage)) {
+      store.setHeritageConfig(data.heritage)
     }
   })
 

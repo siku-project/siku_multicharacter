@@ -222,5 +222,11 @@ return {
     ['appearance.validate'] = 'Valider la création',
     ['appearance.sumIdentity'] = 'Identité',
     ['appearance.sumCharacter'] = 'Personnage',
+    ['appearance.tipPan'] = 'Clic gauche',
+    ['appearance.tipPanHint'] = 'Déplacer la caméra',
+    ['appearance.tipZoom'] = 'Molette',
+    ['appearance.tipZoomHint'] = 'Zoomer / Dézoomer',
+    ['appearance.tipRotate'] = 'Clic droit',
+    ['appearance.tipRotateHint'] = 'Pivoter le personnage',
   },
 }

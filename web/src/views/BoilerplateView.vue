@@ -11,6 +11,7 @@ import CharacterAppearance from '@/views/CharacterAppearance.vue'
 import { useMulticharacterStore } from '@/stores/multicharacter'
 import { MOCK_CHARACTERS, MOCK_SELECTION_CONFIG } from '@/mock/characters'
 import { MOCK_IDENTITY } from '@/mock/identity'
+import { MOCK_HERITAGE } from '@/mock/heritage'
 import { PED_MODELS } from '@/config/appearance'
 
 const store = useMulticharacterStore()
@@ -22,6 +23,7 @@ store.setPedsConfig({
   basics: ['mp_m_freemode_01', 'mp_f_freemode_01'],
   peds: PED_MODELS.filter((model) => !model.labelKey).map((model) => model.id),
 })
+store.setHeritageConfig(MOCK_HERITAGE)
 
 const viewComponents: Record<string, Component> = {
   'Sélection de personnage': CharacterSelection,

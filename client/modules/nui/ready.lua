@@ -33,5 +33,13 @@ RegisterNUICallback('siku_multicharacter:nui:ready', function(_, cb)
     },
   })
 
+  SendNUIMessage({
+    action = 'siku_multicharacter:nui:setHeritage',
+    heritage = {
+      fathers = HeritageConfig.fathers,
+      mothers = HeritageConfig.mothers,
+    },
+  })
+
   cb({})
 end)

@@ -222,5 +222,11 @@ return {
     ['appearance.validate'] = 'Confirm creation',
     ['appearance.sumIdentity'] = 'Identity',
     ['appearance.sumCharacter'] = 'Character',
+    ['appearance.tipPan'] = 'Left click',
+    ['appearance.tipPanHint'] = 'Move the camera',
+    ['appearance.tipZoom'] = 'Wheel',
+    ['appearance.tipZoomHint'] = 'Zoom in / out',
+    ['appearance.tipRotate'] = 'Right click',
+    ['appearance.tipRotateHint'] = 'Rotate the character',
   },
 }

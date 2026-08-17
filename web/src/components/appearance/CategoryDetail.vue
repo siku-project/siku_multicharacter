@@ -5,10 +5,14 @@ import OptionSelect from './controls/OptionSelect.vue'
 import SwatchRow from './controls/SwatchRow.vue'
 import RangeSlider from '@/components/ui/RangeSlider.vue'
 import SpritePicker from './controls/SpritePicker.vue'
+import { storeToRefs } from 'pinia'
 import { resolveIcon } from '@/utils/icons'
+import { parentPortrait } from '@/utils/heritage'
+import { useMulticharacterStore } from '@/stores/multicharacter'
 import { controlKey } from '@/config/appearance'
 import type { AppearanceCategory, AppearanceControl } from '@/config/appearance'
-import eyeColourSprite from '@/assets/mp-eye-colour.png'
+import type { HeritageParent } from '@/utils/multicharacter'
+import eyeColourSprite from '@/assets/mp-eye-colour.webp'
 
 const SPRITE_IMAGES: Record<string, string> = {
   eyeColour: eyeColourSprite,
@@ -36,8 +40,20 @@ const standardControls = computed(() =>
 
 const keyOf = (controlId: string): string => controlKey(props.stepId, props.category.id, controlId)
 
+const { heritageConfig } = storeToRefs(useMulticharacterStore())
+
+const parentList = (control: AppearanceControl): HeritageParent[] =>
+  control.id === 'father' ? heritageConfig.value.fathers : heritageConfig.value.mothers
+
 const selectItems = (control: AppearanceControl): { label: string }[] =>
-  (control.labels ?? []).map((label) => ({ label }))
+  control.portrait
+    ? parentList(control).map((parent) => ({ label: parent.name }))
+    : (control.labels ?? []).map((label) => ({ label }))
+
+const portraitUrl = (control: AppearanceControl): string => {
+  const parent = parentList(control)[props.draft[keyOf(control.id)] ?? 0]
+  return parent ? parentPortrait(parent.id) : ''
+}
 </script>
 
 <template>
@@ -45,8 +61,16 @@ const selectItems = (control: AppearanceControl): { label: string }[] =>
     <div v-if="portraitControls.length > 0" class="grid grid-cols-2 gap-5">
       <div v-for="control in portraitControls" :key="control.id" class="flex flex-col gap-3">
         <div class="portrait mx-auto">
-          <v-icon size="26" :icon="resolveIcon('mdi-account-outline')" />
-          <span class="portrait__tag">{{ t('appearance.photo') }}</span>
+          <img
+            v-if="portraitUrl(control)"
+            class="portrait__img"
+            :src="portraitUrl(control)"
+            alt=""
+          />
+          <template v-else>
+            <v-icon size="26" :icon="resolveIcon('mdi-account-outline')" />
+            <span class="portrait__tag">{{ t('appearance.photo') }}</span>
+          </template>
         </div>
         <div class="flex justify-center">
           <span class="portrait__name">{{ t(control.labelKey) }}</span>
@@ -106,6 +130,7 @@ const selectItems = (control: AppearanceControl): { label: string }[] =>
   gap: 0.45rem;
   width: 7.5rem;
   aspect-ratio: 3 / 3.4;
+  overflow: hidden;
   border-radius: 0.85rem;
   border: 1px solid rgba(212, 231, 247, 0.16);
   background:
@@ -115,6 +140,13 @@ const selectItems = (control: AppearanceControl): { label: string }[] =>
   box-shadow:
     inset 0 1px 0 rgba(233, 244, 253, 0.14),
     inset 0 -18px 34px -26px rgba(5, 14, 30, 0.5);
+}
+
+.portrait__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
 }
 
 .portrait__tag {
