@@ -1,20 +1,26 @@
-local ORBIT_SENSITIVITY <const> = 0.008
-local HEIGHT_SENSITIVITY <const> = 0.004
+local PAN_SENSITIVITY <const> = 0.004
 local ROTATE_SENSITIVITY <const> = 0.5
 local ZOOM_STEP <const> = 0.45
 local MIN_FOCUS_DISTANCE <const> = 0.8
 local MAX_FOCUS_DISTANCE <const> = 8.0
-local MIN_FOCUS_HEIGHT <const> = -0.5
-local MAX_FOCUS_HEIGHT <const> = 2.2
-local HEAD_BONE <const> = 31086
+local GROUND_CLEARANCE <const> = 0.75
 
 local panning = false
 local rotating = false
 
---- Gets the point the creation camera revolves around.
----@return vector3 focus The head position of the player ped.
-local function getFocus()
-  return GetPedBoneCoords(PlayerPedId(), HEAD_BONE, 0.0, 0.0, 0.0)
+--- Checks that a camera position stays around the character: inside the
+--- distance range, and never below the ground at their feet.
+---@param position vector3 The wanted camera position.
+---@return boolean allowed Whether the position is acceptable.
+local function isAllowedPosition(position)
+  local pedCoords <const> = GetEntityCoords(PlayerPedId())
+  local distance <const> = #(position - (pedCoords + vector3(0.0, 0.0, 0.5)))
+
+  if distance < MIN_FOCUS_DISTANCE or distance > MAX_FOCUS_DISTANCE then
+    return false
+  end
+
+  return position.z >= pedCoords.z - GROUND_CLEARANCE
 end
 
 RegisterNUICallback('siku_multicharacter:nui:cameraControlStart', function(data, cb)
@@ -49,18 +55,14 @@ RegisterNUICallback('siku_multicharacter:nui:cameraControlMove', function(data, 
   local movementY <const> = data.movementY or 0
 
   if data.type == 'pan' and panning then
-    local focus <const> = getFocus()
-    local offset <const> = Siku.camera.getCoords(camera) - focus
-    local horizontal <const> = math.sqrt(offset.x * offset.x + offset.y * offset.y)
-    local angle <const> = math.atan(offset.y, offset.x) + movementX * ORBIT_SENSITIVITY
-    local height <const> = math.min(math.max(offset.z + movementY * HEIGHT_SENSITIVITY, MIN_FOCUS_HEIGHT), MAX_FOCUS_HEIGHT)
+    local right <const>, _ <const>, up <const>, position <const> = GetCamMatrix(camera)
+    local wanted <const> = position
+      - right * (movementX * PAN_SENSITIVITY)
+      + up * (movementY * PAN_SENSITIVITY)
 
-    Siku.camera.setCoords(camera, focus + vector3(
-      math.cos(angle) * horizontal,
-      math.sin(angle) * horizontal,
-      height
-    ))
-    Siku.camera.lookAt(camera, focus)
+    if isAllowedPosition(wanted) then
+      Siku.camera.setCoords(camera, wanted)
+    end
   elseif data.type == 'rotate' and rotating then
     local ped <const> = PlayerPedId()
     SetEntityHeading(ped, (GetEntityHeading(ped) + movementX * ROTATE_SENSITIVITY) % 360.0)
@@ -89,11 +91,7 @@ RegisterNUICallback('siku_multicharacter:nui:cameraZoom', function(data, cb)
   local step <const> = data.zoomIn and ZOOM_STEP or -ZOOM_STEP
   local wanted <const> = position + direction * (step / #direction)
 
-  local distance <const> = #(wanted - getFocus())
-
-  if distance < MIN_FOCUS_DISTANCE or distance > MAX_FOCUS_DISTANCE then
-    return
+  if isAllowedPosition(wanted) then
+    Siku.camera.setCoords(camera, wanted)
   end
-
-  Siku.camera.setCoords(camera, wanted)
 end)
