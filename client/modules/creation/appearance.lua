@@ -13,7 +13,7 @@ local OVERLAY_TARGETS <const> = {
 
 local FEATURE_TARGETS <const> = {
   [0] = 'noseWidth', [1] = 'noseHeight', [2] = 'noseLength',
-  [3] = 'noseBridgeHeight', [4] = 'noseBridgeTwist', [5] = 'noseTipHeight',
+  [3] = 'noseBridgeHeight', [4] = 'noseTipHeight', [5] = 'noseBridgeTwist',
   [6] = 'browHeight', [7] = 'browDepth',
   [8] = 'cheekboneHeight', [9] = 'cheekboneWidth', [10] = 'cheekWidth',
   [11] = 'eyesOpening', [12] = 'lipThickness',
