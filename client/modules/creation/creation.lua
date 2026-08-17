@@ -28,6 +28,7 @@ local function restagePlayer(model)
 
   if gender then
     ApplyDefaultCharacter(ped, gender)
+    SendAppearanceLimits(ped)
   end
 
   return ped

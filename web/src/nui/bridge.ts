@@ -13,7 +13,11 @@ interface NuiMessage {
   locale?: unknown
   peds?: unknown
   heritage?: unknown
+  limits?: unknown
 }
+
+const isLimits = (value: unknown): value is Record<string, number> =>
+  !!value && typeof value === 'object' && !Array.isArray(value)
 
 const isHeritageConfig = (value: unknown): value is HeritageConfig => {
   if (!value || typeof value !== 'object') {
@@ -69,6 +73,11 @@ export const initNuiBridge = (): void => {
 
     if (data.action === 'siku_multicharacter:nui:setHeritage' && isHeritageConfig(data.heritage)) {
       store.setHeritageConfig(data.heritage)
+      return
+    }
+
+    if (data.action === 'siku_multicharacter:nui:setLimits' && isLimits(data.limits)) {
+      store.setAppearanceLimits(data.limits)
     }
   })
 
