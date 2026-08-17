@@ -30,6 +30,7 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
     fathers: [],
     mothers: [],
   })
+  const appearanceLimits = ref<Record<string, number>>({})
 
   const setScreen = (next: MulticharacterScreen): void => {
     if (!MULTICHARACTER_SCREENS.includes(next)) {
@@ -62,6 +63,10 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
     heritageConfig.value = next
   }
 
+  const setAppearanceLimits = (next: Record<string, number>): void => {
+    appearanceLimits.value = next
+  }
+
   return {
     screen,
     characters,
@@ -69,6 +74,7 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
     identity,
     pedsConfig,
     heritageConfig,
+    appearanceLimits,
     setScreen,
     hide,
     setCharacters,
@@ -76,5 +82,6 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
     setIdentity,
     setPedsConfig,
     setHeritageConfig,
+    setAppearanceLimits,
   }
 })

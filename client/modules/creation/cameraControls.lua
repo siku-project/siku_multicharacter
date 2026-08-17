@@ -2,21 +2,23 @@ local PAN_SENSITIVITY <const> = 0.004
 local ROTATE_SENSITIVITY <const> = 0.5
 local ZOOM_STEP <const> = 0.45
 local MIN_FOCUS_DISTANCE <const> = 0.8
-local MAX_FOCUS_DISTANCE <const> = 8.0
+local MAX_PAN_DISTANCE <const> = 4.0
+local MAX_ZOOM_DISTANCE <const> = 8.0
 local GROUND_CLEARANCE <const> = 0.75
 
 local panning = false
 local rotating = false
 
 --- Checks that a camera position stays around the character: inside the
---- distance range, and never below the ground at their feet.
+--- allowed distance range, and never below the ground at their feet.
 ---@param position vector3 The wanted camera position.
+---@param maxDistance number The maximum distance from the character.
 ---@return boolean allowed Whether the position is acceptable.
-local function isAllowedPosition(position)
+local function isAllowedPosition(position, maxDistance)
   local pedCoords <const> = GetEntityCoords(PlayerPedId())
   local distance <const> = #(position - (pedCoords + vector3(0.0, 0.0, 0.5)))
 
-  if distance < MIN_FOCUS_DISTANCE or distance > MAX_FOCUS_DISTANCE then
+  if distance < MIN_FOCUS_DISTANCE or distance > maxDistance then
     return false
   end
 
@@ -60,7 +62,7 @@ RegisterNUICallback('siku_multicharacter:nui:cameraControlMove', function(data, 
       - right * (movementX * PAN_SENSITIVITY)
       + up * (movementY * PAN_SENSITIVITY)
 
-    if isAllowedPosition(wanted) then
+    if isAllowedPosition(wanted, MAX_PAN_DISTANCE) then
       Siku.camera.setCoords(camera, wanted)
     end
   elseif data.type == 'rotate' and rotating then
@@ -91,7 +93,7 @@ RegisterNUICallback('siku_multicharacter:nui:cameraZoom', function(data, cb)
   local step <const> = data.zoomIn and ZOOM_STEP or -ZOOM_STEP
   local wanted <const> = position + direction * (step / #direction)
 
-  if isAllowedPosition(wanted) then
+  if isAllowedPosition(wanted, MAX_ZOOM_DISTANCE) then
     Siku.camera.setCoords(camera, wanted)
   end
 end)

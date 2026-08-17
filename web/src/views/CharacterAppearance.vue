@@ -14,7 +14,8 @@ import { resolveIcon } from '@/utils/icons'
 import { sendNuiCallback } from '@/utils/nui'
 import { useMulticharacterStore } from '@/stores/multicharacter'
 import { APPEARANCE_STEPS, controlKey, createAppearanceDraft } from '@/config/appearance'
-import type { AppearanceStepDefinition, PedModel } from '@/config/appearance'
+import type { AppearanceCategory, AppearanceStepDefinition, PedModel } from '@/config/appearance'
+import { buildPhysicalPayload } from '@/utils/physical'
 
 const { t } = useI18n()
 
@@ -23,7 +24,21 @@ const BASIC_PED_LABELS: Record<string, string> = {
   mp_f_freemode_01: 'appearance.pedFemale',
 }
 
-const { pedsConfig, heritageConfig } = storeToRefs(useMulticharacterStore())
+const { pedsConfig, heritageConfig, appearanceLimits } = storeToRefs(useMulticharacterStore())
+
+const LIMIT_BINDINGS: Record<string, string> = {
+  [controlKey('physical', 'hair', 'style')]: 'hairStyles',
+  [controlKey('physical', 'eyebrows', 'shape')]: 'eyebrows',
+  [controlKey('physical', 'beard', 'style')]: 'beard',
+  [controlKey('physical', 'chestHair', 'style')]: 'chestHair',
+  [controlKey('physical', 'ageing', 'style')]: 'ageing',
+  [controlKey('physical', 'makeup', 'lipstickStyle')]: 'lipstick',
+  [controlKey('physical', 'makeup', 'makeupStyle')]: 'makeup',
+  [controlKey('physical', 'makeup', 'blushStyle')]: 'blush',
+  [controlKey('physical', 'skinDamage', 'sunDamageStyle')]: 'sunDamage',
+  [controlKey('physical', 'skinDamage', 'molesStyle')]: 'moles',
+  [controlKey('physical', 'skinDamage', 'blemishesStyle')]: 'blemishes',
+}
 
 const availablePeds = computed<PedModel[]>(() => {
   const models: PedModel[] = pedsConfig.value.basics.map((id) => ({
@@ -58,6 +73,28 @@ const categories = computed(() => currentStep.value.categories ?? [])
 const detailCategory = computed(() =>
   categories.value.find((category) => category.id === activeCategoryId.value),
 )
+
+const resolvedDetailCategory = computed<AppearanceCategory | undefined>(() => {
+  const category = detailCategory.value
+
+  if (!category || currentStep.value.id !== 'physical') {
+    return category
+  }
+
+  return {
+    ...category,
+    controls: category.controls.map((control) => {
+      const limitKey = LIMIT_BINDINGS[controlKey('physical', category.id, control.id)]
+      const limit = limitKey ? appearanceLimits.value[limitKey] : undefined
+
+      if (!limit || limit <= 0) {
+        return control
+      }
+
+      return { ...control, max: limit, unit: `/ ${limit}` }
+    }),
+  }
+})
 
 watch(currentIndex, () => {
   activeCategoryId.value = ''
@@ -114,6 +151,12 @@ const heritagePayload = computed(() => {
 
 watch(heritagePayload, (payload) => {
   void sendNuiCallback('siku_multicharacter:nui:heritageChanged', payload)
+})
+
+const physicalPayload = computed(() => buildPhysicalPayload(draft))
+
+watch(physicalPayload, (payload) => {
+  void sendNuiCallback('siku_multicharacter:nui:physicalChanged', payload)
 })
 
 const UI_ZONE_RATIO = 0.4
@@ -343,7 +386,7 @@ const goNext = (): void => {
                       <div class="ice-scroll min-h-0 grow overflow-y-auto pb-3 pr-2">
                         <CategoryDetail
                           :step-id="currentStep.id"
-                          :category="detailCategory"
+                          :category="resolvedDetailCategory ?? detailCategory"
                           :draft="draft"
                           @update="handleUpdate"
                         />
