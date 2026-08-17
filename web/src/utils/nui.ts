@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { AxiosInstance, AxiosResponse } from 'axios'
+import type { AxiosInstance } from 'axios'
 
 const resourceName: string =
   (
@@ -15,16 +15,6 @@ const nui: AxiosInstance = axios.create({
   },
 })
 
-nui.interceptors.response.use(
-  (response: AxiosResponse) => response,
-  (error) => {
-    if (import.meta.env.DEV) {
-      console.warn(`[NUI] Request failed:`, error.config?.url, error.message)
-    }
-    return Promise.reject(error)
-  },
-)
-
 export async function sendNuiCallback<T = unknown, R = unknown>(
   eventName: string,
   data?: T,
@@ -34,14 +24,5 @@ export async function sendNuiCallback<T = unknown, R = unknown>(
     return response.data
   } catch {
     return null
-  }
-}
-
-export async function sendNuiEvent<T = unknown>(eventName: string, data?: T): Promise<boolean> {
-  try {
-    await nui.post(eventName, data ?? {})
-    return true
-  } catch {
-    return false
   }
 }

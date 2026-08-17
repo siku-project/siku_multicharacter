@@ -29,7 +29,7 @@
   width: 1280px;
   height: 1280px;
   transform: translate(-50%, -50%);
-  background-image: url('../../assets/siku-emblem.png');
+  background-image: url('../../assets/siku-emblem.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;

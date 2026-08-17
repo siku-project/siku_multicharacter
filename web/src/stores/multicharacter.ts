@@ -1,6 +1,11 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { CharacterSummary, SelectionConfig } from '@/utils/multicharacter'
+import type {
+  CharacterSummary,
+  HeritageConfig,
+  PedsConfig,
+  SelectionConfig,
+} from '@/utils/multicharacter'
 import type { IdentityDraft } from '@/utils/identity'
 
 export const MULTICHARACTER_SCREENS = ['hidden', 'selection', 'creation', 'appearance'] as const
@@ -16,6 +21,16 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
     showDirtyMoney: false,
   })
   const identity = ref<IdentityDraft | null>(null)
+  const pedsConfig = ref<PedsConfig>({
+    authorizeAll: false,
+    basics: ['mp_m_freemode_01', 'mp_f_freemode_01'],
+    peds: [],
+  })
+  const heritageConfig = ref<HeritageConfig>({
+    fathers: [],
+    mothers: [],
+  })
+  const appearanceLimits = ref<Record<string, number>>({})
 
   const setScreen = (next: MulticharacterScreen): void => {
     if (!MULTICHARACTER_SCREENS.includes(next)) {
@@ -40,15 +55,33 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
     identity.value = next
   }
 
+  const setPedsConfig = (next: PedsConfig): void => {
+    pedsConfig.value = next
+  }
+
+  const setHeritageConfig = (next: HeritageConfig): void => {
+    heritageConfig.value = next
+  }
+
+  const setAppearanceLimits = (next: Record<string, number>): void => {
+    appearanceLimits.value = { ...appearanceLimits.value, ...next }
+  }
+
   return {
     screen,
     characters,
     selectionConfig,
     identity,
+    pedsConfig,
+    heritageConfig,
+    appearanceLimits,
     setScreen,
     hide,
     setCharacters,
     setSelectionConfig,
     setIdentity,
+    setPedsConfig,
+    setHeritageConfig,
+    setAppearanceLimits,
   }
 })

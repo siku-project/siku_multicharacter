@@ -1,18 +1,78 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import IcePanel from '@/components/ui/IcePanel.vue'
 import IceButton from '@/components/ui/IceButton.vue'
+import CameraTips from '@/components/appearance/CameraTips.vue'
 import StepTabs from '@/components/appearance/StepTabs.vue'
 import CategoryCard from '@/components/appearance/CategoryCard.vue'
 import CategoryDetail from '@/components/appearance/CategoryDetail.vue'
 import OptionSelect from '@/components/appearance/controls/OptionSelect.vue'
 import SummaryStep from '@/components/appearance/steps/SummaryStep.vue'
+import { storeToRefs } from 'pinia'
 import { resolveIcon } from '@/utils/icons'
-import { APPEARANCE_STEPS, PED_MODELS, createAppearanceDraft } from '@/config/appearance'
-import type { AppearanceStepDefinition } from '@/config/appearance'
+import { sendNuiCallback } from '@/utils/nui'
+import { useMulticharacterStore } from '@/stores/multicharacter'
+import { APPEARANCE_STEPS, controlKey, createAppearanceDraft } from '@/config/appearance'
+import type { AppearanceCategory, AppearanceStepDefinition, PedModel } from '@/config/appearance'
+import { buildPhysicalPayload } from '@/utils/physical'
+import { CLOTHING_CATEGORIES, buildClothingPayload } from '@/utils/clothing'
+import { ACCESSORY_CATEGORIES, buildAccessoryPayload } from '@/utils/accessories'
+import { TATTOO_ZONES, buildTattooPayload } from '@/utils/tattoos'
 
 const { t } = useI18n()
+
+const BASIC_PED_LABELS: Record<string, string> = {
+  mp_m_freemode_01: 'appearance.pedMale',
+  mp_f_freemode_01: 'appearance.pedFemale',
+}
+
+const { pedsConfig, heritageConfig, appearanceLimits } = storeToRefs(useMulticharacterStore())
+
+const LIMIT_BINDINGS: Record<string, string> = {
+  ...Object.fromEntries(
+    CLOTHING_CATEGORIES.flatMap((category) => [
+      [controlKey('clothing', category, 'model'), `${category}Model`],
+      [controlKey('clothing', category, 'variant'), `${category}Variant`],
+    ]),
+  ),
+  ...Object.fromEntries(
+    ACCESSORY_CATEGORIES.flatMap((category) => [
+      [controlKey('accessories', category, 'model'), `${category}Model`],
+      [controlKey('accessories', category, 'variant'), `${category}Variant`],
+    ]),
+  ),
+  ...Object.fromEntries(
+    TATTOO_ZONES.map((zone) => [controlKey('tattoos', zone, 'tattoo'), `${zone}Tattoo`]),
+  ),
+  [controlKey('physical', 'hair', 'style')]: 'hairStyles',
+  [controlKey('physical', 'eyebrows', 'shape')]: 'eyebrows',
+  [controlKey('physical', 'beard', 'style')]: 'beard',
+  [controlKey('physical', 'chestHair', 'style')]: 'chestHair',
+  [controlKey('physical', 'ageing', 'style')]: 'ageing',
+  [controlKey('physical', 'makeup', 'lipstickStyle')]: 'lipstick',
+  [controlKey('physical', 'makeup', 'makeupStyle')]: 'makeup',
+  [controlKey('physical', 'makeup', 'blushStyle')]: 'blush',
+  [controlKey('physical', 'skinDamage', 'sunDamageStyle')]: 'sunDamage',
+  [controlKey('physical', 'skinDamage', 'molesStyle')]: 'moles',
+  [controlKey('physical', 'skinDamage', 'blemishesStyle')]: 'blemishes',
+}
+
+const availablePeds = computed<PedModel[]>(() => {
+  const models: PedModel[] = pedsConfig.value.basics.map((id) => ({
+    id,
+    labelKey: BASIC_PED_LABELS[id],
+    name: id,
+  }))
+
+  if (pedsConfig.value.authorizeAll) {
+    for (const id of pedsConfig.value.peds) {
+      models.push({ id, name: id })
+    }
+  }
+
+  return models
+})
 
 const currentIndex = ref(0)
 const furthestIndex = ref(0)
@@ -32,6 +92,28 @@ const detailCategory = computed(() =>
   categories.value.find((category) => category.id === activeCategoryId.value),
 )
 
+const resolvedDetailCategory = computed<AppearanceCategory | undefined>(() => {
+  const category = detailCategory.value
+
+  if (!category) {
+    return category
+  }
+
+  return {
+    ...category,
+    controls: category.controls.map((control) => {
+      const limitKey = LIMIT_BINDINGS[controlKey(currentStep.value.id, category.id, control.id)]
+      const limit = limitKey ? appearanceLimits.value[limitKey] : undefined
+
+      if (!limit || limit <= 0) {
+        return control
+      }
+
+      return { ...control, max: limit, unit: `/ ${limit}` }
+    }),
+  }
+})
+
 watch(currentIndex, () => {
   activeCategoryId.value = ''
 })
@@ -49,27 +131,157 @@ const selectCategory = (id: string): void => {
 }
 
 const pedOptions = computed(() =>
-  PED_MODELS.map((model) => ({
+  availablePeds.value.map((model) => ({
     label: model.labelKey ? t(model.labelKey) : (model.name ?? model.id),
     mono: model.id,
   })),
 )
 
-const pedIndex = computed(() => PED_MODELS.findIndex((model) => model.id === pedModel.value))
+const pedIndex = computed(() =>
+  availablePeds.value.findIndex((model) => model.id === pedModel.value),
+)
 
 const handlePedSelect = (index: number): void => {
-  pedModel.value = PED_MODELS[index]?.id ?? ''
+  pedModel.value = availablePeds.value[index]?.id ?? ''
+
+  if (pedModel.value) {
+    void sendNuiCallback('siku_multicharacter:nui:pedSelected', { model: pedModel.value })
+  }
 }
 
 const handleUpdate = (key: string, value: number): void => {
   draft[key] = value
 }
 
+const heritagePayload = computed(() => {
+  const mother =
+    heritageConfig.value.mothers[draft[controlKey('heritage', 'parents', 'mother')] ?? 0]
+  const father =
+    heritageConfig.value.fathers[draft[controlKey('heritage', 'parents', 'father')] ?? 0]
+
+  return {
+    mother: mother?.id ?? 21,
+    father: father?.id ?? 0,
+    resemblance: (draft[controlKey('heritage', 'resemblance', 'resemblance')] ?? 50) / 100,
+    skinTone: (draft[controlKey('heritage', 'resemblance', 'skinTone')] ?? 50) / 100,
+  }
+})
+
+watch(heritagePayload, (payload) => {
+  void sendNuiCallback('siku_multicharacter:nui:heritageChanged', payload)
+})
+
+const physicalPayload = computed(() => buildPhysicalPayload(draft))
+
+watch(physicalPayload, (payload) => {
+  void sendNuiCallback('siku_multicharacter:nui:physicalChanged', payload)
+})
+
+const clothingPayload = computed(() => buildClothingPayload(draft))
+
+watch(clothingPayload, (payload) => {
+  void sendNuiCallback('siku_multicharacter:nui:clothingChanged', payload)
+})
+
+const accessoryPayload = computed(() => buildAccessoryPayload(draft))
+
+watch(accessoryPayload, (payload) => {
+  void sendNuiCallback('siku_multicharacter:nui:accessoriesChanged', payload)
+})
+
+const tattooPayload = computed(() => buildTattooPayload(draft))
+
+watch(tattooPayload, (payload) => {
+  void sendNuiCallback('siku_multicharacter:nui:tattoosChanged', payload)
+})
+
+const UI_ZONE_RATIO = 0.4
+
+const cameraControlsActive = computed(() => currentStep.value.id !== 'ped')
+
+let leftHeld = false
+let rightHeld = false
+
+const isInsideUiZone = (event: MouseEvent): boolean =>
+  event.clientX < window.innerWidth * UI_ZONE_RATIO
+
+const handleMouseDown = (event: MouseEvent): void => {
+  if (!cameraControlsActive.value || isInsideUiZone(event)) {
+    return
+  }
+
+  if (event.button === 0) {
+    leftHeld = true
+    void sendNuiCallback('siku_multicharacter:nui:cameraControlStart', { type: 'pan' })
+  } else if (event.button === 2) {
+    rightHeld = true
+    void sendNuiCallback('siku_multicharacter:nui:cameraControlStart', { type: 'rotate' })
+  }
+}
+
+const handleMouseUp = (event: MouseEvent): void => {
+  if (event.button === 0 && leftHeld) {
+    leftHeld = false
+    void sendNuiCallback('siku_multicharacter:nui:cameraControlStop', { type: 'pan' })
+  } else if (event.button === 2 && rightHeld) {
+    rightHeld = false
+    void sendNuiCallback('siku_multicharacter:nui:cameraControlStop', { type: 'rotate' })
+  }
+}
+
+const handleMouseMove = (event: MouseEvent): void => {
+  if (!leftHeld && !rightHeld) {
+    return
+  }
+
+  void sendNuiCallback('siku_multicharacter:nui:cameraControlMove', {
+    type: leftHeld ? 'pan' : 'rotate',
+    movementX: event.movementX,
+    movementY: event.movementY,
+  })
+}
+
+const handleWheel = (event: WheelEvent): void => {
+  if (!cameraControlsActive.value || isInsideUiZone(event)) {
+    return
+  }
+
+  event.preventDefault()
+
+  void sendNuiCallback('siku_multicharacter:nui:cameraZoom', {
+    zoomIn: event.deltaY < 0,
+    mouseX: event.clientX / window.innerWidth,
+    mouseY: event.clientY / window.innerHeight,
+  })
+}
+
+const handleContextMenu = (event: MouseEvent): void => {
+  if (!isInsideUiZone(event)) {
+    event.preventDefault()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('mousedown', handleMouseDown)
+  document.addEventListener('mouseup', handleMouseUp)
+  document.addEventListener('mousemove', handleMouseMove)
+  document.addEventListener('wheel', handleWheel, { passive: false })
+  document.addEventListener('contextmenu', handleContextMenu)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', handleMouseDown)
+  document.removeEventListener('mouseup', handleMouseUp)
+  document.removeEventListener('mousemove', handleMouseMove)
+  document.removeEventListener('wheel', handleWheel)
+  document.removeEventListener('contextmenu', handleContextMenu)
+})
+
 const goNext = (): void => {
   if (isLast.value) {
-    console.log('[siku_multicharacter] appearance validated', {
+    void sendNuiCallback('siku_multicharacter:nui:appearanceValidated', {
       pedModel: pedModel.value,
-      draft: { ...draft },
+      appearance: { ...draft },
     })
     return
   }
@@ -81,6 +293,10 @@ const goNext = (): void => {
 <template>
   <div class="pointer-events-none fixed inset-0">
     <div class="scrim absolute inset-0" aria-hidden="true"></div>
+
+    <Transition name="head-pop" appear>
+      <CameraTips v-if="cameraControlsActive" />
+    </Transition>
 
     <div class="absolute inset-y-0 left-0 flex w-[880px] flex-col px-10 pb-8 pt-9">
       <Transition name="head-pop" appear>
@@ -206,7 +422,7 @@ const goNext = (): void => {
                       <div class="ice-scroll min-h-0 grow overflow-y-auto pb-3 pr-2">
                         <CategoryDetail
                           :step-id="currentStep.id"
-                          :category="detailCategory"
+                          :category="resolvedDetailCategory ?? detailCategory"
                           :draft="draft"
                           @update="handleUpdate"
                         />

@@ -8,6 +8,7 @@ import 'vuetify/styles'
 
 import App from './App.vue'
 import i18n from './i18n'
+import { initNuiBridge } from './nui/bridge'
 
 const vuetify = createVuetify({
   theme: {
@@ -34,5 +35,7 @@ if (import.meta.env.DEV) {
     i18n.global.setLocaleMessage(language, messages)
   }
 }
+
+initNuiBridge()
 
 app.mount('#app')
