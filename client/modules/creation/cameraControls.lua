@@ -2,7 +2,7 @@ local PAN_SENSITIVITY <const> = 0.004
 local ROTATE_SENSITIVITY <const> = 0.5
 local ZOOM_STEP <const> = 0.45
 local MIN_FOCUS_DISTANCE <const> = 0.8
-local MAX_PAN_DISTANCE <const> = 1.0
+local MAX_PAN_DISTANCE <const> = 2.0
 local MAX_ZOOM_DISTANCE <const> = 8.0
 local GROUND_CLEARANCE <const> = 0.75
 
