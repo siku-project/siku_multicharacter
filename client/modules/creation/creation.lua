@@ -106,6 +106,12 @@ function GetCreationCamera()
   return sceneCamera
 end
 
+--- Forgets the creation camera once the scene is over.
+---@return nil
+function ClearCreationCamera()
+  sceneCamera = nil
+end
+
 --- Gets the identity submitted from the creation interface.
 ---@return table|nil identity The identity draft, or nil before submission.
 function GetIdentityDraft()

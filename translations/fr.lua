@@ -7,6 +7,13 @@ return {
   error_no_license = 'Aucune licence utilisable pour %s (%d).',
   error_account_create_failed = 'Échec de la création du compte pour %s (session %d).',
   error_screen_never_faded = "L'écran n'est jamais passé au noir.",
+  error_collision_never_loaded = "Les collisions n'ont jamais fini de charger.",
+  error_missing_identity = "Validation d'apparence sans identité enregistrée.",
+  error_invalid_character_payload = 'Données de personnage invalides pour la session %d.',
+  error_no_user_for_character = 'Aucun compte en cache pour la session %d.',
+  error_character_create_failed = 'Échec de la création du personnage %s (session %d).',
+  error_character_load_failed = 'Échec du chargement du personnage %d (session %d).',
+  drop_character_create_failed = 'Impossible de créer votre personnage. Reconnectez-vous.',
 
   web = {
     ['selection.slot'] = 'Emplacement {number}',
