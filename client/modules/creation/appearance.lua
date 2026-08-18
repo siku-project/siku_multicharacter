@@ -45,9 +45,10 @@ function SendAppearanceLimits(ped)
   })
 end
 
-RegisterNUICallback('siku_multicharacter:nui:heritageChanged', function(data, cb)
-  cb({})
-
+--- Applies a heritage payload to the player ped.
+---@param data table The heritage payload { mother, father, resemblance, skinTone }.
+---@return nil
+function ApplyHeritage(data)
   if type(data) ~= 'table' then
     return
   end
@@ -62,11 +63,17 @@ RegisterNUICallback('siku_multicharacter:nui:heritageChanged', function(data, cb
     mother, father, 0,
     (data.resemblance or 0.5) + 0.0, (data.skinTone or 0.5) + 0.0, 0.0, false
   )
+end
+
+RegisterNUICallback('siku_multicharacter:nui:heritageChanged', function(data, cb)
+  cb({})
+  ApplyHeritage(data)
 end)
 
-RegisterNUICallback('siku_multicharacter:nui:physicalChanged', function(data, cb)
-  cb({})
-
+--- Applies a physical payload to the player ped.
+---@param data table The physical payload { hair, eyeColor, overlays, features }.
+---@return nil
+function ApplyPhysical(data)
   if type(data) ~= 'table' then
     return
   end
@@ -98,4 +105,9 @@ RegisterNUICallback('siku_multicharacter:nui:physicalChanged', function(data, cb
   for index, key in pairs(FEATURE_TARGETS) do
     SetPedFaceFeature(ped, index, (features[key] or 0) + 0.0)
   end
+end
+
+RegisterNUICallback('siku_multicharacter:nui:physicalChanged', function(data, cb)
+  cb({})
+  ApplyPhysical(data)
 end)

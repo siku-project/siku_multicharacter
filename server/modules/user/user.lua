@@ -1,3 +1,21 @@
+--- Retrieves an existing account, instantiates it in the core cache and
+--- routes the client to the character selection screen.
+---@param sessionId number The player server ID.
+---@param userId number The account database ID.
+---@return nil
+local function retrieveUser(sessionId, userId)
+  local userData <const> = MySQL.single.await('SELECT * FROM users WHERE id = ?', { userId })
+
+  if not userData then
+    Siku.print.error(T('error_account_load_failed', userId, sessionId))
+    DropPlayer(tostring(sessionId), T('drop_account_load_failed'))
+    return
+  end
+
+  TriggerEvent('siku:server:createUserInstance', sessionId, userData)
+  TriggerClientEvent('siku_multicharacter:client:prepareCharacterSelect', sessionId)
+end
+
 --- Creates a new account, instantiates it in the core cache and routes the
 --- client straight to the character creation screen.
 ---@param sessionId number The player server ID.
@@ -70,7 +88,7 @@ local function handlePlayerReady()
   local userId <const> = MySQL.scalar.await('SELECT id FROM users WHERE license = ?', { license })
 
   if userId then
-    retrieveUser(sessionId, userId) -- TODO
+    retrieveUser(sessionId, userId)
   else
     createUser(sessionId, license, identifiers)
   end
