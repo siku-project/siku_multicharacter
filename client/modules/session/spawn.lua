@@ -20,6 +20,8 @@ RegisterNetEvent('siku_multicharacter:client:spawnCharacter', function(position)
     ClearCreationCamera()
   end
 
+  ClearSelectionCamera()
+
   SetEntityVisible(ped, true, false)
   FreezeEntityPosition(ped, false)
   SetPlayerControl(PlayerId(), true, 0)
