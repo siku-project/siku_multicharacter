@@ -39,11 +39,6 @@ local function stagePlayer()
   ShutdownLoadingScreenNui()
 end
 
-RegisterNetEvent('siku_multicharacter:client:prepareCharacterSelect', function()
-  stagePlayer()
-  Siku.print.debug('Routing to character selection')
-end)
-
 RegisterNetEvent('siku_multicharacter:client:prepareCharacterCreation', function()
   stagePlayer()
   SetNuiFocus(true, true)
