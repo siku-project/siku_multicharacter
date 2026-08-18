@@ -6,6 +6,8 @@ import { useMulticharacterStore } from '@/stores/multicharacter'
 import { sendNuiCallback } from '@/utils/nui'
 import type { IdentityDraft } from '@/utils/identity'
 
+const MUSIC_PLAYER_ENABLED = false
+
 const store = useMulticharacterStore()
 
 const handleSubmit = (draft: IdentityDraft): void => {
@@ -22,7 +24,7 @@ const handleSubmit = (draft: IdentityDraft): void => {
         <IdentityForm @submit="handleSubmit" />
       </Transition>
       <Transition name="player-pop" appear>
-        <MusicPlayer class="creation__player" />
+        <MusicPlayer v-if="MUSIC_PLAYER_ENABLED" class="creation__player" />
       </Transition>
     </div>
   </div>
