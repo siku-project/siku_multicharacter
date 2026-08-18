@@ -28,9 +28,10 @@ function SendClothingLimits(ped)
   })
 end
 
-RegisterNUICallback('siku_multicharacter:nui:clothingChanged', function(data, cb)
-  cb({})
-
+--- Applies a clothing payload to the player ped.
+---@param data table The clothing payload, indexed by slot key.
+---@return nil
+function ApplyClothing(data)
   if type(data) ~= 'table' then
     return
   end
@@ -51,4 +52,9 @@ RegisterNUICallback('siku_multicharacter:nui:clothingChanged', function(data, cb
   end
 
   SendClothingLimits(ped)
+end
+
+RegisterNUICallback('siku_multicharacter:nui:clothingChanged', function(data, cb)
+  cb({})
+  ApplyClothing(data)
 end)

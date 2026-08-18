@@ -1,14 +1,26 @@
-RegisterNetEvent('siku_multicharacter:client:spawnCharacter', function(position)
-  if type(position) ~= 'table' then
+RegisterNetEvent('siku_multicharacter:client:spawnCharacter', function(data)
+  if type(data) ~= 'table' or type(data.position) ~= 'table' then
     return
   end
 
-  local ped <const> = PlayerPedId()
+  local position <const> = data.position
+  local spawn <const> = vector4(
+    position.x + 0.0,
+    position.y + 0.0,
+    position.z + 0.0,
+    (position.heading or 0.0) + 0.0
+  )
 
-  SetEntityCoordsNoOffset(ped, position.x + 0.0, position.y + 0.0, position.z + 0.0, false, false, false)
-  SetEntityHeading(ped, position.heading + 0.0)
+  local ped = PlayerPedId()
 
-  RequestCollisionAtCoord(position.x + 0.0, position.y + 0.0, position.z + 0.0)
+  if data.model then
+    ped = ApplyCharacterLook(data.model, data.appearance, spawn)
+  else
+    SetEntityCoordsNoOffset(ped, spawn.x, spawn.y, spawn.z, false, false, false)
+    SetEntityHeading(ped, spawn.w)
+  end
+
+  RequestCollisionAtCoord(spawn.x, spawn.y, spawn.z)
   Siku.WaitFor(function()
     return HasCollisionLoadedAroundEntity(ped) or nil
   end, T('error_collision_never_loaded'), 10000)
@@ -24,6 +36,7 @@ RegisterNetEvent('siku_multicharacter:client:spawnCharacter', function(position)
 
   SetEntityVisible(ped, true, false)
   FreezeEntityPosition(ped, false)
+  SetEntityInvincible(ped, false)
   SetPlayerControl(PlayerId(), true, 0)
   SetPlayerInvincible(PlayerId(), false)
 

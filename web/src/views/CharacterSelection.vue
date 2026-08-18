@@ -8,6 +8,7 @@ import CharacterDetails from '@/components/selection/CharacterDetails.vue'
 import DeleteCharacterModal from '@/components/selection/DeleteCharacterModal.vue'
 import { useMulticharacterStore } from '@/stores/multicharacter'
 import { characterInSlot } from '@/utils/multicharacter'
+import { sendNuiCallback } from '@/utils/nui'
 
 const { characters, selectionConfig: config } = storeToRefs(useMulticharacterStore())
 
@@ -19,10 +20,12 @@ const actionsTop = import.meta.env.DEV ? 'top-24' : 'top-8'
 
 const selectedCharacter = computed(() => characterInSlot(characters.value, selectedSlot.value))
 
-watch(selectedSlot, () => {
+watch(selectedSlot, (slot) => {
   if (!selectedCharacter.value) {
     showInfo.value = false
   }
+
+  void sendNuiCallback('siku_multicharacter:nui:slotChanged', { slot })
 })
 
 watch(characters, (next) => {
@@ -36,7 +39,11 @@ const handleSelect = (slot: number): void => {
 }
 
 const handleJoin = (): void => {
-  console.log('[siku_multicharacter] join city with character', selectedCharacter.value?.id)
+  if (!selectedCharacter.value) {
+    return
+  }
+
+  void sendNuiCallback('siku_multicharacter:nui:playCharacter', { id: selectedCharacter.value.id })
 }
 
 const handleRemove = (): void => {
@@ -55,7 +62,7 @@ const handleDeleteConfirm = (): void => {
 }
 
 const handleCreate = (): void => {
-  console.log('[siku_multicharacter] create character in slot', selectedSlot.value)
+  void sendNuiCallback('siku_multicharacter:nui:startCreation', { slot: selectedSlot.value })
 }
 
 const handleInfo = (): void => {
