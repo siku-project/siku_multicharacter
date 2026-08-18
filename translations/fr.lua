@@ -16,6 +16,7 @@ return {
   error_account_load_failed = 'Échec du chargement du compte %d (session %d).',
   error_characters_fetch_failed = 'Échec de la récupération des personnages : %s.',
   warn_characters_over_slots = "%d personnages pour le compte %d alors qu'il n'y a que %d emplacements : les surplus ne sont pas affichés.",
+  warn_character_not_owned = "Le personnage %d n'appartient pas au compte %d (session %d).",
   drop_character_create_failed = 'Impossible de créer votre personnage. Reconnectez-vous.',
 
   web = {

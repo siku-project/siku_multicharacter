@@ -16,6 +16,7 @@ return {
   error_account_load_failed = 'Failed to load account %d (session %d).',
   error_characters_fetch_failed = 'Failed to fetch characters: %s.',
   warn_characters_over_slots = '%d characters for account %d with only %d slots: the extra ones are not shown.',
+  warn_character_not_owned = 'Character %d does not belong to account %d (session %d).',
   drop_character_create_failed = 'Failed to create your character. Please reconnect.',
 
   web = {

@@ -46,9 +46,10 @@ function SendAccessoryLimits(ped)
   })
 end
 
-RegisterNUICallback('siku_multicharacter:nui:accessoriesChanged', function(data, cb)
-  cb({})
-
+--- Applies an accessory payload to the player ped.
+---@param data table The accessory payload, indexed by slot key.
+---@return nil
+function ApplyAccessories(data)
   if type(data) ~= 'table' then
     return
   end
@@ -87,4 +88,9 @@ RegisterNUICallback('siku_multicharacter:nui:accessoriesChanged', function(data,
   end
 
   SendAccessoryLimits(ped)
+end
+
+RegisterNUICallback('siku_multicharacter:nui:accessoriesChanged', function(data, cb)
+  cb({})
+  ApplyAccessories(data)
 end)

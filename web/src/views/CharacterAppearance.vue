@@ -281,7 +281,13 @@ const goNext = (): void => {
   if (isLast.value) {
     void sendNuiCallback('siku_multicharacter:nui:appearanceValidated', {
       pedModel: pedModel.value,
-      appearance: { ...draft },
+      appearance: {
+        heritage: heritagePayload.value,
+        physical: physicalPayload.value,
+        clothing: clothingPayload.value,
+        accessories: accessoryPayload.value,
+        tattoos: tattooPayload.value,
+      },
     })
     return
   }

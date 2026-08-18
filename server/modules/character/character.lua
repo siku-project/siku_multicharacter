@@ -87,9 +87,11 @@ RegisterNetEvent('siku_multicharacter:server:createCharacter', function(data)
   Siku.print.debug(('Character %d created for user %d (session %d)'):format(characterId, user.id, sessionId))
 
   TriggerClientEvent('siku_multicharacter:client:spawnCharacter', sessionId, {
-    x = characterData.x,
-    y = characterData.y,
-    z = characterData.z,
-    heading = characterData.heading,
+    position = {
+      x = characterData.x,
+      y = characterData.y,
+      z = characterData.z,
+      heading = characterData.heading,
+    },
   })
 end)

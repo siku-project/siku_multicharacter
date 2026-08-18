@@ -81,9 +81,10 @@ function SendTattooLimits(ped)
   })
 end
 
-RegisterNUICallback('siku_multicharacter:nui:tattoosChanged', function(data, cb)
-  cb({})
-
+--- Applies a tattoo payload to the player ped.
+---@param data table The tattoo payload, indexed by zone key.
+---@return nil
+function ApplyTattoos(data)
   if type(data) ~= 'table' then
     return
   end
@@ -102,4 +103,9 @@ RegisterNUICallback('siku_multicharacter:nui:tattoosChanged', function(data, cb)
       AddPedDecorationFromHashes(ped, joaat(tattoo.collection), joaat(tattoo.hash))
     end
   end
+end
+
+RegisterNUICallback('siku_multicharacter:nui:tattoosChanged', function(data, cb)
+  cb({})
+  ApplyTattoos(data)
 end)
