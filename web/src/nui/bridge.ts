@@ -5,7 +5,12 @@ import {
 } from '@/stores/multicharacter'
 import { applyLocale, isLocalePayload } from '@/utils/locale'
 import { sendNuiCallback } from '@/utils/nui'
-import type { HeritageConfig, PedsConfig } from '@/utils/multicharacter'
+import type {
+  CharacterSummary,
+  HeritageConfig,
+  PedsConfig,
+  SelectionConfig,
+} from '@/utils/multicharacter'
 
 interface NuiMessage {
   action?: unknown
@@ -14,6 +19,8 @@ interface NuiMessage {
   peds?: unknown
   heritage?: unknown
   limits?: unknown
+  characters?: unknown
+  config?: unknown
 }
 
 const isLimits = (value: unknown): value is Record<string, number> =>
@@ -78,6 +85,15 @@ export const initNuiBridge = (): void => {
 
     if (data.action === 'siku_multicharacter:nui:setLimits' && isLimits(data.limits)) {
       store.setAppearanceLimits(data.limits)
+      return
+    }
+
+    if (data.action === 'siku_multicharacter:nui:setCharacters' && Array.isArray(data.characters)) {
+      store.setCharacters(data.characters as CharacterSummary[])
+
+      if (data.config && typeof data.config === 'object') {
+        store.setSelectionConfig(data.config as SelectionConfig)
+      }
     }
   })
 

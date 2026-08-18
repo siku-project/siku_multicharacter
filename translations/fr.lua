@@ -13,6 +13,9 @@ return {
   error_no_user_for_character = 'Aucun compte en cache pour la session %d.',
   error_character_create_failed = 'Échec de la création du personnage %s (session %d).',
   error_character_load_failed = 'Échec du chargement du personnage %d (session %d).',
+  error_account_load_failed = 'Échec du chargement du compte %d (session %d).',
+  error_characters_fetch_failed = 'Échec de la récupération des personnages : %s.',
+  warn_characters_over_slots = "%d personnages pour le compte %d alors qu'il n'y a que %d emplacements : les surplus ne sont pas affichés.",
   drop_character_create_failed = 'Impossible de créer votre personnage. Reconnectez-vous.',
 
   web = {

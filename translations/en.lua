@@ -13,6 +13,9 @@ return {
   error_no_user_for_character = 'No cached account for session %d.',
   error_character_create_failed = 'Failed to create character %s (session %d).',
   error_character_load_failed = 'Failed to load character %d (session %d).',
+  error_account_load_failed = 'Failed to load account %d (session %d).',
+  error_characters_fetch_failed = 'Failed to fetch characters: %s.',
+  warn_characters_over_slots = '%d characters for account %d with only %d slots: the extra ones are not shown.',
   drop_character_create_failed = 'Failed to create your character. Please reconnect.',
 
   web = {
