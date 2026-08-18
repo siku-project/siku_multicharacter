@@ -1,4 +1,10 @@
 local SELECTION_MODEL <const> = 'mp_m_freemode_01'
+local CAMERA_DISTANCE <const> = 2.8
+local CAMERA_HEIGHT <const> = 1.6
+local CAMERA_FOCUS_HEIGHT <const> = 0.6
+local CAMERA_FOV <const> = 45.0
+
+local selectionCamera = nil
 
 --- Resets every ped clothing component and prop to its default.
 ---@param ped number The ped handle.
@@ -14,9 +20,8 @@ local function setDefaultClothes(ped)
 end
 
 --- Stages the player at the staging spot behind a black screen, then
---- shuts the loading screen down. The selection screen shows no scene,
---- so no camera is involved.
----@return nil
+--- shuts the loading screen down.
+---@return number ped The staged ped handle.
 local function stageForSelection()
   DoScreenFadeOut(500)
   Siku.WaitFor(function()
@@ -36,15 +41,51 @@ local function stageForSelection()
   SetEntityCoords(ped, staging.x, staging.y, staging.z, false, false, false, true)
   SetEntityHeading(ped, staging.w)
   FreezeEntityPosition(ped, true)
-  SetEntityVisible(ped, false, false)
+  SetEntityVisible(ped, true, false)
+  SetEntityInvincible(ped, true)
   SetPlayerControl(PlayerId(), false, 0)
 
   ShutdownLoadingScreen()
   ShutdownLoadingScreenNui()
+
+  return ped
+end
+
+--- Places the fixed selection camera in front of the staged character,
+--- framed exactly like the one the creation scene settles on.
+---@param ped number The ped handle.
+---@return nil
+local function placeSelectionCamera(ped)
+  local staging <const> = SpawnConfig.characterSelectionSpawn
+  local base <const> = vector3(staging.x, staging.y, staging.z)
+  local forward <const> = GetEntityForwardVector(ped)
+  local coords <const> = base + forward * CAMERA_DISTANCE + vector3(0.0, 0.0, CAMERA_HEIGHT)
+  local focus <const> = base + vector3(0.0, 0.0, CAMERA_FOCUS_HEIGHT)
+
+  selectionCamera = Siku.camera.create({
+    coords = coords,
+    rotation = Siku.camera.rotationTo(coords, focus),
+    fov = CAMERA_FOV,
+  })
+
+  Siku.camera.render(selectionCamera)
+end
+
+--- Destroys the selection camera once the screen is over.
+---@return nil
+function ClearSelectionCamera()
+  if not selectionCamera then
+    return
+  end
+
+  Siku.camera.destroy(selectionCamera)
+  selectionCamera = nil
 end
 
 RegisterNetEvent('siku_multicharacter:client:prepareCharacterSelect', function()
-  stageForSelection()
+  local ped <const> = stageForSelection()
+
+  placeSelectionCamera(ped)
 
   local ok <const>, payload = Siku.TriggerServerCallback('siku_multicharacter:callback:getCharacters')
 
@@ -61,6 +102,8 @@ RegisterNetEvent('siku_multicharacter:client:prepareCharacterSelect', function()
 
   SetNuiFocus(true, true)
   SendNUIMessage({ action = 'siku_multicharacter:nui:setScreen', screen = 'selection' })
+
+  DoScreenFadeIn(800)
 
   Siku.print.debug(('Character selection opened with %d character(s)'):format(#(payload.characters or {})))
 end)
