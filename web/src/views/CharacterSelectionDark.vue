@@ -112,8 +112,12 @@ const handleRemove = (): void => {
 }
 
 const handleDeleteConfirm = (): void => {
-  console.log('[siku_multicharacter] delete confirmed for character', selected.value?.id)
+  if (!selected.value) {
+    return
+  }
+
   showDeleteModal.value = false
+  void sendNuiCallback('siku_multicharacter:nui:deleteCharacter', { id: selected.value.id })
 }
 </script>
 
@@ -213,6 +217,7 @@ const handleDeleteConfirm = (): void => {
 
     <DeleteCharacterModal
       class="pointer-events-auto"
+      variant="dark"
       :open="showDeleteModal"
       :character-name="selected ? fullName : ''"
       @cancel="showDeleteModal = false"

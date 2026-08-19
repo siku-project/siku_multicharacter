@@ -1166,6 +1166,7 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
 ]
 
 const TATTOO_ZONES = [
+  { id: 'hair', labelKey: 'appearance.catHair', icon: 'mdi-content-cut' },
   { id: 'head', labelKey: 'appearance.catHead', icon: 'mdi-head-outline' },
   { id: 'neck', labelKey: 'appearance.catNeck', icon: 'mdi-tie' },
   { id: 'torso', labelKey: 'appearance.catTorso', icon: 'mdi-tshirt-crew' },

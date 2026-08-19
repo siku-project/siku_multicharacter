@@ -57,8 +57,14 @@ const handleDeleteCancel = (): void => {
 }
 
 const handleDeleteConfirm = (): void => {
-  console.log('[siku_multicharacter] delete confirmed for character', selectedCharacter.value?.id)
+  if (!selectedCharacter.value) {
+    return
+  }
+
   showDeleteModal.value = false
+  void sendNuiCallback('siku_multicharacter:nui:deleteCharacter', {
+    id: selectedCharacter.value.id,
+  })
 }
 
 const handleCreate = (): void => {
