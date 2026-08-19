@@ -1,7 +1,9 @@
 import {
   MULTICHARACTER_SCREENS,
+  MULTICHARACTER_THEMES,
   useMulticharacterStore,
   type MulticharacterScreen,
+  type MulticharacterTheme,
 } from '@/stores/multicharacter'
 import { applyLocale, isLocalePayload } from '@/utils/locale'
 import { sendNuiCallback } from '@/utils/nui'
@@ -15,6 +17,7 @@ import type {
 interface NuiMessage {
   action?: unknown
   screen?: unknown
+  interface?: unknown
   locale?: unknown
   peds?: unknown
   heritage?: unknown
@@ -49,6 +52,18 @@ const isPedsConfig = (value: unknown): value is PedsConfig => {
 const isScreen = (value: unknown): value is MulticharacterScreen =>
   typeof value === 'string' && MULTICHARACTER_SCREENS.includes(value as MulticharacterScreen)
 
+const readTheme = (value: unknown): MulticharacterTheme | null => {
+  if (!value || typeof value !== 'object') {
+    return null
+  }
+
+  const theme = (value as { theme?: unknown }).theme
+
+  return typeof theme === 'string' && MULTICHARACTER_THEMES.includes(theme as MulticharacterTheme)
+    ? (theme as MulticharacterTheme)
+    : null
+}
+
 export const initNuiBridge = (): void => {
   window.addEventListener('message', (event: MessageEvent<NuiMessage>) => {
     const data = event.data
@@ -65,6 +80,15 @@ export const initNuiBridge = (): void => {
 
     if (data.action === 'siku_multicharacter:nui:hide') {
       store.hide()
+      return
+    }
+
+    if (data.action === 'siku_multicharacter:nui:setInterface') {
+      const theme = readTheme(data.interface)
+
+      if (theme) {
+        store.setTheme(theme)
+      }
       return
     }
 

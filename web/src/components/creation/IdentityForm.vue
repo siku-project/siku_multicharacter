@@ -10,7 +10,13 @@ import RangeSlider from '@/components/ui/RangeSlider.vue'
 import GlassCalendar from './fields/GlassCalendar.vue'
 import GlassDateInput from './fields/GlassDateInput.vue'
 import IdentityPreview from './IdentityPreview.vue'
-import { HEIGHT_MAX, HEIGHT_MIN, createIdentityDraft, isIdentityDraftValid } from '@/utils/identity'
+import {
+  HEIGHT_MAX,
+  HEIGHT_MIN,
+  createIdentityDraft,
+  isIdentityDraftValid,
+  validateIdentity,
+} from '@/utils/identity'
 import { getCountryOptions } from '@/utils/countries'
 import type { IdentityDraft } from '@/utils/identity'
 
@@ -33,6 +39,13 @@ const genderOptions = computed(() => [
 const nationalityOptions = computed(() => getCountryOptions(locale.value))
 
 const isValid = computed(() => isIdentityDraftValid(draft))
+
+const errors = computed(() => validateIdentity(draft))
+
+const errorText = (field: 'firstName' | 'lastName' | 'birthDate' | 'height'): string => {
+  const error = errors.value[field]
+  return error ? t(error.key, error.params ?? {}) : ''
+}
 
 const applyPickedDate = (day: number, month: number, year: number): void => {
   draft.birthDay = String(day)
@@ -101,11 +114,13 @@ const handleSubmit = (): void => {
               v-model="draft.firstName"
               :label="t('creation.firstName')"
               :placeholder="t('creation.firstNamePlaceholder')"
+              :error="errorText('firstName')"
             />
             <GlassInput
               v-model="draft.lastName"
               :label="t('creation.lastName')"
               :placeholder="t('creation.lastNamePlaceholder')"
+              :error="errorText('lastName')"
             />
 
             <GlassSegmented
@@ -135,6 +150,7 @@ const handleSubmit = (): void => {
                 :month="draft.birthMonth"
                 :year="draft.birthYear"
                 :placeholder="t('creation.datePlaceholder')"
+                :error="errorText('birthDate')"
                 @update="applyTypedDate"
                 @open="showCalendar = true"
               />
