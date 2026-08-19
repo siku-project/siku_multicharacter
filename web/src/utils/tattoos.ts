@@ -1,6 +1,7 @@
 import { controlKey } from '@/config/appearance'
 
 export const TATTOO_ZONES = [
+  'hair',
   'head',
   'neck',
   'torso',
