@@ -12,8 +12,13 @@ export const MULTICHARACTER_SCREENS = ['hidden', 'selection', 'creation', 'appea
 
 export type MulticharacterScreen = (typeof MULTICHARACTER_SCREENS)[number]
 
+export const MULTICHARACTER_THEMES = ['glass', 'minimal', 'dark'] as const
+
+export type MulticharacterTheme = (typeof MULTICHARACTER_THEMES)[number]
+
 export const useMulticharacterStore = defineStore('multicharacter', () => {
   const screen = ref<MulticharacterScreen>('hidden')
+  const theme = ref<MulticharacterTheme>('glass')
   const characters = ref<CharacterSummary[]>([])
   const selectionConfig = ref<SelectionConfig>({
     slots: 1,
@@ -43,6 +48,13 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
     screen.value = 'hidden'
   }
 
+  const setTheme = (next: MulticharacterTheme): void => {
+    if (!MULTICHARACTER_THEMES.includes(next)) {
+      return
+    }
+    theme.value = next
+  }
+
   const setCharacters = (next: CharacterSummary[]): void => {
     characters.value = next
   }
@@ -69,6 +81,7 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
 
   return {
     screen,
+    theme,
     characters,
     selectionConfig,
     identity,
@@ -77,6 +90,7 @@ export const useMulticharacterStore = defineStore('multicharacter', () => {
     appearanceLimits,
     setScreen,
     hide,
+    setTheme,
     setCharacters,
     setSelectionConfig,
     setIdentity,

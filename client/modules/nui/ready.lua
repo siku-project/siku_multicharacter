@@ -17,6 +17,13 @@ end
 
 RegisterNUICallback('siku_multicharacter:nui:ready', function(_, cb)
   SendNUIMessage({
+    action = 'siku_multicharacter:nui:setInterface',
+    interface = {
+      theme = InterfaceConfig.theme,
+    },
+  })
+
+  SendNUIMessage({
     action = 'siku_multicharacter:nui:setLocale',
     locale = {
       language = TranslationConfig.language,
