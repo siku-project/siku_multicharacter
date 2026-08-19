@@ -1,6 +1,7 @@
 local FEMALE_MODEL <const> = joaat('mp_f_freemode_01')
 
 local ZONE_SLOTS <const> = {
+  { key = 'hair', zone = 'ZONE_HAIR' },
   { key = 'head', zone = 'ZONE_HEAD' },
   { key = 'neck', zone = 'ZONE_HEAD' },
   { key = 'torso', zone = 'ZONE_TORSO' },

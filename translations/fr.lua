@@ -17,6 +17,8 @@ return {
   error_characters_fetch_failed = 'Échec de la récupération des personnages : %s.',
   warn_characters_over_slots = "%d personnages pour le compte %d alors qu'il n'y a que %d emplacements : les surplus ne sont pas affichés.",
   warn_character_not_owned = "Le personnage %d n'appartient pas au compte %d (session %d).",
+  warn_delete_not_allowed = "Suppression du personnage %d refusée (session %d) : elle est désactivée en configuration.",
+  info_character_deleted = 'Personnage %d supprimé du compte %d (session %d).',
   drop_character_create_failed = 'Impossible de créer votre personnage. Reconnectez-vous.',
 
   web = {
