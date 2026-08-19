@@ -9,10 +9,12 @@ const props = withDefaults(
     month: string
     year: string
     placeholder?: string
+    error?: string
   }>(),
   {
     label: '',
     placeholder: '',
+    error: '',
   },
 )
 
@@ -112,6 +114,7 @@ watch(
     <span class="field__control">
       <input
         class="field__input"
+        :class="{ 'field__input--invalid': error }"
         type="text"
         inputmode="numeric"
         :value="display"
@@ -126,6 +129,9 @@ watch(
       />
       <v-icon class="field__icon" size="16" :icon="resolveIcon('mdi-calendar-blank-outline')" />
     </span>
+    <Transition name="field-error">
+      <span v-if="error" class="field__error">{{ error }}</span>
+    </Transition>
   </label>
 </template>
 
@@ -203,5 +209,32 @@ watch(
 
 .field:focus-within .field__icon {
   color: rgba(240, 248, 255, 0.85);
+}
+
+.field__input--invalid,
+.field__input--invalid:hover,
+.field__input--invalid:focus {
+  border-color: rgba(244, 110, 122, 0.55);
+  box-shadow: 0 0 20px -10px rgba(244, 110, 122, 0.7);
+}
+
+.field__error {
+  font-size: 11.5px;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  color: rgba(246, 158, 167, 0.9);
+}
+
+.field-error-enter-active,
+.field-error-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.field-error-enter-from,
+.field-error-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>

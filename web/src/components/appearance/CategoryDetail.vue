@@ -18,11 +18,17 @@ const SPRITE_IMAGES: Record<string, string> = {
   eyeColour: eyeColourSprite,
 }
 
-const props = defineProps<{
-  stepId: string
-  category: AppearanceCategory
-  draft: Record<string, number>
-}>()
+const props = withDefaults(
+  defineProps<{
+    stepId: string
+    category: AppearanceCategory
+    draft: Record<string, number>
+    variant?: 'glass' | 'minimal' | 'dark'
+  }>(),
+  {
+    variant: 'glass',
+  },
+)
 
 const emit = defineEmits<{
   update: [key: string, value: number]
@@ -78,6 +84,7 @@ const portraitUrl = (control: AppearanceControl): string => {
         <OptionSelect
           :model-value="draft[keyOf(control.id)] ?? 0"
           :options="selectItems(control)"
+          :variant="variant"
           @update:model-value="emit('update', keyOf(control.id), $event)"
         />
       </div>

@@ -6,8 +6,14 @@ import DevTopBar from '@/components/boilerplate/DevTopBar.vue'
 import DevFab from '@/components/boilerplate/DevFab.vue'
 import DevViewSelector from '@/components/boilerplate/DevViewSelector.vue'
 import CharacterSelection from '@/views/CharacterSelection.vue'
+import CharacterSelectionMinimal from '@/views/CharacterSelectionMinimal.vue'
+import CharacterSelectionDark from '@/views/CharacterSelectionDark.vue'
 import CharacterCreation from '@/views/CharacterCreation.vue'
+import CharacterCreationMinimal from '@/views/CharacterCreationMinimal.vue'
+import CharacterCreationDark from '@/views/CharacterCreationDark.vue'
 import CharacterAppearance from '@/views/CharacterAppearance.vue'
+import CharacterAppearanceMinimal from '@/views/CharacterAppearanceMinimal.vue'
+import CharacterAppearanceDark from '@/views/CharacterAppearanceDark.vue'
 import { useMulticharacterStore } from '@/stores/multicharacter'
 import { MOCK_CHARACTERS, MOCK_SELECTION_CONFIG } from '@/mock/characters'
 import { MOCK_IDENTITY } from '@/mock/identity'
@@ -26,9 +32,15 @@ store.setPedsConfig({
 store.setHeritageConfig(MOCK_HERITAGE)
 
 const viewComponents: Record<string, Component> = {
-  'Sélection de personnage': CharacterSelection,
-  "Création d'identité": CharacterCreation,
-  'Apparence du personnage': CharacterAppearance,
+  'Sélection · Glass': CharacterSelection,
+  'Sélection · Minimal': CharacterSelectionMinimal,
+  'Sélection · Dark': CharacterSelectionDark,
+  "Création d'identité · Glass": CharacterCreation,
+  "Création d'identité · Minimal": CharacterCreationMinimal,
+  "Création d'identité · Dark": CharacterCreationDark,
+  'Apparence · Glass': CharacterAppearance,
+  'Apparence · Minimal': CharacterAppearanceMinimal,
+  'Apparence · Dark': CharacterAppearanceDark,
 }
 
 const views: string[] = Object.keys(viewComponents)

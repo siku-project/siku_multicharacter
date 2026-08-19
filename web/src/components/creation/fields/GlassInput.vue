@@ -6,12 +6,14 @@ withDefaults(
     placeholder?: string
     type?: string
     maxlength?: number
+    error?: string
   }>(),
   {
     label: '',
     placeholder: '',
     type: 'text',
     maxlength: 40,
+    error: '',
   },
 )
 
@@ -25,6 +27,7 @@ const emit = defineEmits<{
     <span v-if="label" class="field__label">{{ label }}</span>
     <input
       class="field__input"
+      :class="{ 'field__input--invalid': error }"
       :value="modelValue"
       :type="type"
       :placeholder="placeholder"
@@ -32,6 +35,9 @@ const emit = defineEmits<{
       spellcheck="false"
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     />
+    <Transition name="field-error">
+      <span v-if="error" class="field__error">{{ error }}</span>
+    </Transition>
   </label>
 </template>
 
@@ -99,5 +105,32 @@ const emit = defineEmits<{
 .field__input[type='number'] {
   appearance: textfield;
   -moz-appearance: textfield;
+}
+
+.field__input--invalid,
+.field__input--invalid:hover,
+.field__input--invalid:focus {
+  border-color: rgba(244, 110, 122, 0.55);
+  box-shadow: 0 0 20px -10px rgba(244, 110, 122, 0.7);
+}
+
+.field__error {
+  font-size: 11.5px;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  color: rgba(246, 158, 167, 0.9);
+}
+
+.field-error-enter-active,
+.field-error-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.field-error-enter-from,
+.field-error-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>
