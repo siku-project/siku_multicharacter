@@ -21,7 +21,7 @@ RegisterNetEvent('siku_multicharacter:client:spawnCharacter', function(data)
   end
 
   RequestCollisionAtCoord(spawn.x, spawn.y, spawn.z)
-  Siku.WaitFor(function()
+  Siku.waitFor(function()
     return HasCollisionLoadedAroundEntity(ped) or nil
   end, T('error_collision_never_loaded'), 10000)
 

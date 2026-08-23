@@ -16,12 +16,12 @@ end
 ---@return nil
 local function stagePlayer()
   DoScreenFadeOut(500)
-  Siku.WaitFor(function()
+  Siku.waitFor(function()
     return IsScreenFadedOut() or nil
   end, T('error_screen_never_faded'), 2000)
 
   local staging <const> = SpawnConfig.characterSelectionSpawn
-  local modelHash <const> = Siku.RequestModel('mp_m_freemode_01')
+  local modelHash <const> = Siku.streaming.requestModel('mp_m_freemode_01')
 
   SetPlayerModel(PlayerId(), modelHash)
   SetModelAsNoLongerNeeded(modelHash)

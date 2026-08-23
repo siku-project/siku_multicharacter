@@ -13,7 +13,7 @@ local function announceReady()
 end
 
 CreateThread(function()
-  Siku.WaitFor(function()
+  Siku.waitFor(function()
     return NetworkIsPlayerActive(PlayerId()) or nil
   end, T('error_session_never_started'), false)
 
