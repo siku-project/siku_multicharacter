@@ -12,7 +12,6 @@ lua54 'yes'
 shared_scripts {
   '@siku_core/init.lua',
   'config/*.lua',
-  'shared/utils/locale.lua',
 }
 
 server_scripts {

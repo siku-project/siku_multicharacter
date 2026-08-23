@@ -11,7 +11,7 @@ local FREEMODE_GENDERS <const> = {
 ---@param staging vector4 Where the ped belongs.
 ---@return number ped The restaged ped handle.
 local function applyModel(model, staging)
-  local modelHash <const> = Siku.RequestModel(model)
+  local modelHash <const> = Siku.streaming.requestModel(model)
 
   SetPlayerModel(PlayerId(), modelHash)
   SetModelAsNoLongerNeeded(modelHash)

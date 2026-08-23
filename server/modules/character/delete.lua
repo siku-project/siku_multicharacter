@@ -56,7 +56,7 @@ RegisterNetEvent('siku_multicharacter:server:deleteCharacter', function(characte
     { user.id, characterId }
   )
 
-  user:removeCharacter(characterId)
+  Siku.cache.removeCharacter(sessionId, characterId)
 
   Siku.print.info(T('info_character_deleted', characterId, user.id, sessionId))
 

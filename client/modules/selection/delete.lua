@@ -10,7 +10,7 @@ RegisterNUICallback('siku_multicharacter:nui:deleteCharacter', function(data, cb
     SetNuiFocus(false, false)
 
     DoScreenFadeOut(600)
-    Siku.WaitFor(function()
+    Siku.waitFor(function()
       return IsScreenFadedOut() or nil
     end, T('error_screen_never_faded'), 2000)
 

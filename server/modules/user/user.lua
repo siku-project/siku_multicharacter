@@ -76,7 +76,7 @@ local function handlePlayerReady()
     return
   end
 
-  local identifiers <const> = Siku.GetIdentifiers(sessionId)
+  local identifiers <const> = Siku.player.getIdentifiers(sessionId)
   local license <const> = identifiers.license
 
   if not license then
