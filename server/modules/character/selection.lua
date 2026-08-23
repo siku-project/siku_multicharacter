@@ -73,7 +73,7 @@ local function formatCharacter(row, slot)
   }
 end
 
-Siku.RegisterCallback('siku_multicharacter:callback:getCharacters', function(sessionId)
+Siku.callback.register('siku_multicharacter:callback:getCharacters', function(sessionId)
   local user <const> = Siku.cache.getPlayer(sessionId)
 
   if not user then

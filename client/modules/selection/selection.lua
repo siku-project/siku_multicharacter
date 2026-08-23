@@ -12,7 +12,7 @@ local looks = {}
 ---@return number ped The staged ped handle.
 local function stageForSelection()
   DoScreenFadeOut(500)
-  Siku.WaitFor(function()
+  Siku.waitFor(function()
     return IsScreenFadedOut() or nil
   end, T('error_screen_never_faded'), 2000)
 
@@ -89,7 +89,7 @@ RegisterNetEvent('siku_multicharacter:client:prepareCharacterSelect', function()
 
   placeSelectionCamera(ped)
 
-  local ok <const>, payload = Siku.TriggerServerCallback('siku_multicharacter:callback:getCharacters')
+  local ok <const>, payload = Siku.callback.triggerServer('siku_multicharacter:callback:getCharacters')
 
   if not ok then
     Siku.print.error(T('error_characters_fetch_failed', tostring(payload)))
