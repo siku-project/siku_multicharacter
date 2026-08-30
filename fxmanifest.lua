@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Siku Studio'
 description 'The official multicharacter system of the SIKU ecosystem — a modern, modular and immersive resource for creating, managing, and selecting player characters with seamless integration and a polished user experience.'
-version '0.1.0'
+version '1.0.0'
 
 name 'siku_multicharacter'
 
