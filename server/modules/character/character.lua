@@ -80,7 +80,13 @@ RegisterNetEvent('siku_multicharacter:server:createCharacter', function(data)
 
   TriggerEvent('siku:server:createCharacterInstance', sessionId, characterData)
 
-  if SpawnConfig.playerInstance then
+  --- A fresh character can be handed to the introduction: it plays inside
+  --- the private instance and releases it itself at the end. Without the
+  --- introduction, the bucket is released here and the spawn is direct.
+  local handover <const> = SpawnConfig.introOnCreation
+    and GetResourceState('siku_intro') == 'started'
+
+  if SpawnConfig.playerInstance and not handover then
     Siku.bucket.releasePlayerInstance(sessionId)
   end
 
@@ -93,5 +99,10 @@ RegisterNetEvent('siku_multicharacter:server:createCharacter', function(data)
       z = characterData.z,
       heading = characterData.heading,
     },
+    handover = handover,
   })
+
+  if handover then
+    exports.siku_intro:Start(sessionId)
+  end
 end)
