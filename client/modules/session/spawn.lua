@@ -15,15 +15,17 @@ RegisterNetEvent('siku_multicharacter:client:spawnCharacter', function(data)
 
   if data.model then
     ped = ApplyCharacterLook(data.model, data.appearance, spawn)
-  else
+  elseif not data.handover then
     SetEntityCoordsNoOffset(ped, spawn.x, spawn.y, spawn.z, false, false, false)
     SetEntityHeading(ped, spawn.w)
   end
 
-  RequestCollisionAtCoord(spawn.x, spawn.y, spawn.z)
-  Siku.waitFor(function()
-    return HasCollisionLoadedAroundEntity(ped) or nil
-  end, T('error_collision_never_loaded'), 10000)
+  if not data.handover then
+    RequestCollisionAtCoord(spawn.x, spawn.y, spawn.z)
+    Siku.waitFor(function()
+      return HasCollisionLoadedAroundEntity(ped) or nil
+    end, T('error_collision_never_loaded'), 10000)
+  end
 
   local camera <const> = GetCreationCamera()
 
@@ -36,6 +38,14 @@ RegisterNetEvent('siku_multicharacter:client:spawnCharacter', function(data)
 
   SetEntityVisible(ped, true, false)
   FreezeEntityPosition(ped, false)
+
+  if data.handover then
+    --- The introduction takes over from here: it places the character,
+    --- fades in on its own first shot, and gives control back at the end.
+    Siku.print.debug('Character handed over to the introduction')
+    return
+  end
+
   SetEntityInvincible(ped, false)
   SetPlayerControl(PlayerId(), true, 0)
   SetPlayerInvincible(PlayerId(), false)
