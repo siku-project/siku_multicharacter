@@ -32,6 +32,14 @@ SpawnConfig = {
   --- Default: true
   playerInstance = true,
 
+  --- Whether a freshly created character is handed to siku_intro for the
+  --- cinematic introduction instead of spawning directly. Only applies
+  --- when the siku_intro resource is started; selection of an existing
+  --- character always spawns normally.
+  ---
+  --- Default: true
+  introOnCreation = true,
+
   --- Where a freshly created character enters the world for the first
   --- time (x, y, z, heading).
   ---
