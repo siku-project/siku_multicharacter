@@ -20,6 +20,8 @@ local function stagePlayer()
     return IsScreenFadedOut() or nil
   end, T('error_screen_never_faded'), 2000)
 
+  HideGameInterface()
+
   local staging <const> = SpawnConfig.characterSelectionSpawn
   local modelHash <const> = Siku.streaming.requestModel('mp_m_freemode_01')
 
