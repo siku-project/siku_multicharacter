@@ -253,5 +253,7 @@ return {
     ['appearance.tipZoomHint'] = 'Zoomer / Dézoomer',
     ['appearance.tipRotate'] = 'Clic droit',
     ['appearance.tipRotateHint'] = 'Pivoter le personnage',
+    ['appearance.tipHandsUp'] = 'Touche X',
+    ['appearance.tipHandsUpHint'] = 'Lever les bras',
   },
 }

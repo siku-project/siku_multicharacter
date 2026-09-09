@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CameraTips from '@/components/appearance/CameraTips.vue'
+import { useHandsUpKey } from '@/composables/useHandsUpKey'
 import CategoryDetail from '@/components/appearance/CategoryDetail.vue'
 import OptionSelect from '@/components/appearance/controls/OptionSelect.vue'
 import SummaryStep from '@/components/appearance/steps/SummaryStep.vue'
@@ -202,6 +203,8 @@ watch(tattooPayload, (payload) => {
 const UI_ZONE_RATIO = 0.4
 
 const cameraControlsActive = computed(() => currentStep.value.id !== 'ped')
+
+useHandsUpKey(cameraControlsActive)
 
 let leftHeld = false
 let rightHeld = false
