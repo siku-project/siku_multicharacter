@@ -13,7 +13,14 @@ withDefaults(
 
 const { t } = useI18n()
 
-const TIPS = [
+interface Tip {
+  labelKey: string
+  hintKey: string
+  position?: string
+  keyCap?: string
+}
+
+const TIPS: Tip[] = [
   { position: '0% center', labelKey: 'appearance.tipPan', hintKey: 'appearance.tipPanHint' },
   { position: '50% center', labelKey: 'appearance.tipZoom', hintKey: 'appearance.tipZoomHint' },
   {
@@ -21,6 +28,7 @@ const TIPS = [
     labelKey: 'appearance.tipRotate',
     hintKey: 'appearance.tipRotateHint',
   },
+  { keyCap: 'X', labelKey: 'appearance.tipHandsUp', hintKey: 'appearance.tipHandsUpHint' },
 ]
 </script>
 
@@ -30,7 +38,9 @@ const TIPS = [
       <template v-for="(tip, index) in TIPS" :key="tip.labelKey">
         <div v-if="index > 0" class="tips__sep" aria-hidden="true"></div>
         <div class="flex items-center gap-2.5">
+          <div v-if="tip.keyCap" class="tips__key">{{ tip.keyCap }}</div>
           <div
+            v-else
             class="tips__icon"
             :style="{
               backgroundImage: `url(${tipsSprite})`,
@@ -58,6 +68,42 @@ const TIPS = [
   height: 34px;
   background-repeat: no-repeat;
   opacity: 0.92;
+}
+
+.tips__key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.tips--glass .tips__key {
+  border: 1px solid rgba(148, 184, 220, 0.3);
+  background: linear-gradient(180deg, rgba(140, 180, 225, 0.16) 0%, rgba(140, 180, 225, 0.06) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(226, 240, 255, 0.14),
+    0 2px 0 rgba(2, 6, 16, 0.5);
+  color: rgba(232, 242, 252, 0.95);
+}
+
+.tips--minimal .tips__key {
+  border: 1px solid rgba(160, 200, 235, 0.24);
+  background: rgba(160, 200, 235, 0.08);
+  box-shadow: 0 2px 0 rgba(4, 10, 22, 0.6);
+  color: rgba(240, 248, 255, 0.92);
+}
+
+.tips--dark .tips__key {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.8);
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .tips--glass {

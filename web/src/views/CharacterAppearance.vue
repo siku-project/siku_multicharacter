@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import IcePanel from '@/components/ui/IcePanel.vue'
 import IceButton from '@/components/ui/IceButton.vue'
 import CameraTips from '@/components/appearance/CameraTips.vue'
+import { useHandsUpKey } from '@/composables/useHandsUpKey'
 import StepTabs from '@/components/appearance/StepTabs.vue'
 import CategoryCard from '@/components/appearance/CategoryCard.vue'
 import CategoryDetail from '@/components/appearance/CategoryDetail.vue'
@@ -198,6 +199,8 @@ watch(tattooPayload, (payload) => {
 const UI_ZONE_RATIO = 0.4
 
 const cameraControlsActive = computed(() => currentStep.value.id !== 'ped')
+
+useHandsUpKey(cameraControlsActive)
 
 let leftHeld = false
 let rightHeld = false

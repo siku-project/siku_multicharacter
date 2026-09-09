@@ -253,5 +253,7 @@ return {
     ['appearance.tipZoomHint'] = 'Zoom in / out',
     ['appearance.tipRotate'] = 'Right click',
     ['appearance.tipRotateHint'] = 'Rotate the character',
+    ['appearance.tipHandsUp'] = 'X key',
+    ['appearance.tipHandsUpHint'] = 'Raise the arms',
   },
 }

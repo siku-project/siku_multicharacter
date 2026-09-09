@@ -232,6 +232,8 @@ export const DEV_MESSAGES: Record<string, Record<string, string>> = {
     'appearance.tipZoomHint': 'Zoomer / Dézoomer',
     'appearance.tipRotate': 'Clic droit',
     'appearance.tipRotateHint': 'Pivoter le personnage',
+    'appearance.tipHandsUp': 'Touche X',
+    'appearance.tipHandsUpHint': 'Lever les bras',
   },
   en: {
     'selection.slot': 'Slot {number}',
@@ -465,5 +467,7 @@ export const DEV_MESSAGES: Record<string, Record<string, string>> = {
     'appearance.tipZoomHint': 'Zoom in / out',
     'appearance.tipRotate': 'Right click',
     'appearance.tipRotateHint': 'Rotate the character',
+    'appearance.tipHandsUp': 'X key',
+    'appearance.tipHandsUpHint': 'Raise the arms',
   },
 }
