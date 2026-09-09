@@ -13,6 +13,7 @@ RegisterNUICallback('siku_multicharacter:nui:appearanceValidated', function(data
   end
 
   CreateThread(function()
+    ResetCreationPose()
     SendNUIMessage({ action = 'siku_multicharacter:nui:setScreen', screen = 'hidden' })
     SetNuiFocus(false, false)
 

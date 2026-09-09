@@ -11,6 +11,8 @@ local FREEMODE_GENDERS <const> = {
 ---@param model string The ped model name.
 ---@return number ped The restaged ped handle.
 local function restagePlayer(model)
+  ResetCreationPose()
+
   local modelHash <const> = Siku.streaming.requestModel(model)
 
   SetPlayerModel(PlayerId(), modelHash)

@@ -16,6 +16,8 @@ local function stageForSelection()
     return IsScreenFadedOut() or nil
   end, T('error_screen_never_faded'), 2000)
 
+  HideGameInterface()
+
   local ped <const> = ApplyCharacterLook(SELECTION_MODEL, nil, SpawnConfig.characterSelectionSpawn)
 
   SetEntityVisible(ped, true, false)
