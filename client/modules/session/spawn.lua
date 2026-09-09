@@ -38,6 +38,7 @@ RegisterNetEvent('siku_multicharacter:client:spawnCharacter', function(data)
 
   SetEntityVisible(ped, true, false)
   FreezeEntityPosition(ped, false)
+  ShowGameInterface()
 
   if data.handover then
     --- The introduction takes over from here: it places the character,
