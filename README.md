@@ -2,7 +2,7 @@
 
 The official multicharacter system of the SIKU ecosystem — a modern, modular and immersive resource for creating, managing, and selecting player characters with seamless integration and a polished user experience.
 
-![Version](https://img.shields.io/badge/version-1.0.0-4785bd)
+![Version](https://img.shields.io/badge/version-1.1.0-4785bd)
 ![FiveM](https://img.shields.io/badge/fx__version-cerulean-4785bd)
 ![Lua](https://img.shields.io/badge/Lua-5.4-4785bd)
 ![Vue](https://img.shields.io/badge/NUI-Vue%203-4785bd)
@@ -57,7 +57,7 @@ All options live in `config/` and are documented inline.
 
 | File | Options |
 |---|---|
-| `config/spawn.lua` | `characterSlots`, `playerCanDeleteCharacter`, `characterSelectionSpawn`, `playerInstance` (private bucket during selection), `spawnPosition` |
+| `config/spawn.lua` | `characterSlots`, `playerCanDeleteCharacter`, `characterSelectionSpawn`, `playerInstance` (private bucket during selection), `introOnCreation`, `deathPersistence` (a character left dead comes back dead; disabled, the flag is cleared on entry), `spawnPosition` |
 | `config/interface.lua` | `theme` (`glass` / `minimal` / `dark`) |
 | `config/character.lua` | The default look applied to a fresh character. |
 | `config/peds.lua` | The ped models offered by the appearance editor. |

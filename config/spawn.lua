@@ -40,6 +40,16 @@ SpawnConfig = {
   --- Default: true
   introOnCreation = true,
 
+  --- Whether a character left dead comes back dead.
+  ---
+  --- The core flags a character dead the moment its ped dies and alive
+  --- when it gets back up. Enabled, a character whose flag is set spawns
+  --- dead where it was, so a disconnect is no way out. Disabled, the flag
+  --- is cleared on entry and the character spawns standing.
+  ---
+  --- Default: true
+  deathPersistence = true,
+
   --- Where a freshly created character enters the world for the first
   --- time (x, y, z, heading).
   ---
