@@ -51,6 +51,10 @@ RegisterNetEvent('siku_multicharacter:client:spawnCharacter', function(data)
   SetPlayerControl(PlayerId(), true, 0)
   SetPlayerInvincible(PlayerId(), false)
 
+  if data.dead then
+    SetEntityHealth(ped, 0)
+  end
+
   DoScreenFadeIn(800)
-  Siku.print.debug('Character spawned in the world')
+  Siku.print.debug(data.dead and 'Character spawned dead, as it was left' or 'Character spawned in the world')
 end)
