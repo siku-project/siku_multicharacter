@@ -32,6 +32,7 @@
   let furthestIndex = $state(0)
   let pedModel = $state('')
   let activeCategoryId = $state('')
+  let panel = $state<HTMLDivElement | null>(null)
 
   const total = APPEARANCE_STEPS.length
   const step = $derived(APPEARANCE_STEPS[currentIndex] as AppearanceStep)
@@ -78,6 +79,12 @@
 
   $effect(() => {
     activeCategoryId = categories[0]?.id ?? ''
+  })
+
+  $effect(() => {
+    void step.id
+    void activeCategoryId
+    panel?.scrollTo({ top: 0 })
   })
 
   const peds = $derived.by(() => {
@@ -213,7 +220,7 @@
           <Divider />
         {/if}
 
-        <div class="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+        <div bind:this={panel} class="min-h-0 flex-1 overflow-y-auto px-6 py-5">
           {#key `${step.id}-${activeCategoryId}`}
             <div in:fade={{ duration: 160 }}>
               {#if step.id === 'ped'}
