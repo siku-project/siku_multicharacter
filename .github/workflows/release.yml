@@ -18,13 +18,6 @@ jobs:
       - name: Setup bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Allow reading the private design system
-        env:
-          SIKU_UI_TOKEN: ${{ secrets.SIKU_UI_TOKEN }}
-        run: |
-          [ -n "$SIKU_UI_TOKEN" ] || { echo "::error::SIKU_UI_TOKEN secret is missing (read access to siku-project/siku-ui)."; exit 1; }
-          git config --global url."https://x-access-token:${SIKU_UI_TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
-
       - name: Build web
         working-directory: web
         run: |
