@@ -1,8 +1,8 @@
 # AGENTS.md
 
 <!-- siku:begin -->
-<!-- Généré par « bunx siku ai sync » (@siku/ui 1.12.0). Ne pas modifier entre les marqueurs. -->
-## Design system SIKU (@siku/ui 1.12.0) — obligatoire pour toute interface
+<!-- Généré par « bunx siku ai sync » (@siku/ui 1.13.0). Ne pas modifier entre les marqueurs. -->
+## Design system SIKU (@siku/ui 1.13.0) — obligatoire pour toute interface
 
 Cette ressource utilise le design system officiel SIKU. Avant de créer ou modifier une interface (dossier `web/`) :
 
