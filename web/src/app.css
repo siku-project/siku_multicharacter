@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.mc-brand-bar {
+  width: 3px;
+  align-self: stretch;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+}
+
+.mc-shell {
+  height: min(55rem, calc(100vh - 4.75rem));
+}
+
+.mc-portrait {
+  width: 7.5rem;
+  height: 8.5rem;
+}
+
+.mc-dot {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  border-radius: var(--radius-full);
+  box-shadow: inset 0 0 0 var(--border-hairline) var(--border-strong);
+}
