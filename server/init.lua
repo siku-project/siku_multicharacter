@@ -1,0 +1,9 @@
+local REQUIRED_CORE_VERSION <const> = '1.6.2'
+
+local dependency <const> = Siku.version.checkDependency('siku_core', REQUIRED_CORE_VERSION)
+
+if not dependency.ok then
+  error(dependency.message)
+end
+
+Siku.version.checkRelease('siku-project/siku_multicharacter')
