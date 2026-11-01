@@ -23,7 +23,7 @@ Siku.command.register('relog', function(src)
   local character <const> = Siku.cache.getCurrentCharacter(src)
   local previous <const>, seconds <const> = Flow.enter(src, 'selection')
 
-  Siku.log.info('multicharacter.relog', ('%s left %s after %ds to pick a character'):format(user.name, character and character:getFullName() or ('character ' .. characterId), seconds), {
+  Siku.log.info('multicharacter.relog', ('%s left %s after %ds to pick a character'):format(user.name, character and ('%s %s'):format(character.firstName, character.lastName) or ('character ' .. characterId), seconds), {
     characterId = characterId,
     playSeconds = seconds,
     previous = previous,

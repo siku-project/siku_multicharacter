@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Siku Studio'
 description 'The official multicharacter system of the SIKU ecosystem: account routing, character selection, identity and appearance creation, spawning.'
-version '2.0.2'
+version '2.0.3'
 
 name 'siku_multicharacter'
 
