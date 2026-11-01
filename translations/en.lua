@@ -7,6 +7,8 @@ return {
   error_session_never_started = 'The network session never started.',
   error_screen_never_faded = 'The screen never faded to black.',
   error_collision_never_loaded = 'Collisions never finished loading.',
+  relog_title = 'Characters',
+  relog_no_character = 'You have no character in play.',
 
   web = {
     ['selection_tagline'] = 'Choose your story',

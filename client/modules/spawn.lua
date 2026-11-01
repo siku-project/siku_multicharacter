@@ -45,6 +45,7 @@ RegisterNetEvent('siku_multicharacter:client:spawn', function(data)
   Hud.show()
 
   if data.handover then
+    TriggerServerEvent('siku_multicharacter:server:spawned')
     return
   end
 
@@ -57,4 +58,5 @@ RegisterNetEvent('siku_multicharacter:client:spawn', function(data)
   end
 
   DoScreenFadeIn(800)
+  TriggerServerEvent('siku_multicharacter:server:spawned')
 end)

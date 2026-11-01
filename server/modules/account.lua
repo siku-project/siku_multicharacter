@@ -1,12 +1,6 @@
 local OPEN_EVENT <const> = 'siku_multicharacter:client:open'
 
 ---@param sessionId number
----@param screen 'selection'|'creation'
-local function open(sessionId, screen)
-  TriggerClientEvent(OPEN_EVENT, sessionId, screen)
-end
-
----@param sessionId number
 local function isolate(sessionId)
   if SpawnConfig.privateInstance and not Siku.bucket.isPlayerInstanced(sessionId) then
     Siku.bucket.createPlayerInstance(sessionId)
@@ -42,11 +36,29 @@ end
 
 RegisterNetEvent('siku_multicharacter:server:playerReady', function()
   local sessionId <const> = source
+  local previous <const>, seconds <const> = Flow.enter(sessionId, 'account')
+
+  Siku.log.debug('multicharacter.stage', ('%s: account after %ds in %s'):format(GetPlayerName(tostring(sessionId)) or sessionId, seconds, tostring(previous)), {
+    stage = 'account',
+    previous = previous,
+    seconds = seconds,
+  }, { source = sessionId, entities = Flow.entities(sessionId) })
 
   isolate(sessionId)
 
   if Siku.cache.hasPlayer(sessionId) then
-    open(sessionId, 'selection')
+    local cached <const> = Siku.cache.getPlayer(sessionId)
+
+    Flow.identify(sessionId, cached.id, cached.name)
+    Flow.enter(sessionId, 'selection')
+
+    Siku.log.debug('multicharacter.stage', ('%s: selection, account already cached'):format(cached.name), {
+      stage = 'selection',
+      previous = 'account',
+      seconds = 0,
+    }, { source = sessionId, entities = Flow.entities(sessionId) })
+
+    TriggerClientEvent(OPEN_EVENT, sessionId, 'selection')
     return
   end
 
@@ -74,5 +86,18 @@ RegisterNetEvent('siku_multicharacter:server:playerReady', function()
     return
   end
 
-  open(sessionId, fresh and 'creation' or 'selection')
+  local screen <const> = fresh and 'creation' or 'selection'
+  local stage <const> = fresh and 'identity' or 'selection'
+  local accountSeconds <const> = select(2, Flow.enter(sessionId, stage))
+
+  Flow.identify(sessionId, user.id, identifiers.name)
+
+  Siku.log.debug('multicharacter.stage', ('%s: %s after %ds in account%s'):format(identifiers.name, stage, accountSeconds, fresh and ', new account' or ''), {
+    stage = stage,
+    previous = 'account',
+    seconds = accountSeconds,
+    newAccount = fresh,
+  }, { source = sessionId, entities = Flow.entities(sessionId) })
+
+  TriggerClientEvent(OPEN_EVENT, sessionId, screen)
 end)

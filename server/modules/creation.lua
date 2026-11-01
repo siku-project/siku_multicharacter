@@ -1,5 +1,6 @@
 local INTRO_RESOURCE <const> = 'siku_intro'
 local DEFAULT_MODEL <const> = 'mp_m_freemode_01'
+local OPEN_EVENT <const> = 'siku_multicharacter:client:open'
 
 ---@param model unknown The model the client picked.
 ---@return string|nil model The model when the configuration offers it.
@@ -39,7 +40,16 @@ RegisterNetEvent('siku_multicharacter:server:createCharacter', function(data)
   end
 
   if Characters.count(user.id) >= CharactersConfig.slots then
-    TriggerClientEvent('siku_multicharacter:client:open', sessionId, 'selection')
+    Flow.enter(sessionId, 'selection')
+
+    Siku.log.debug('multicharacter.stage', ('%s: selection, every slot is taken'):format(user.name), {
+      stage = 'selection',
+      previous = 'appearance',
+      seconds = 0,
+      slots = CharactersConfig.slots,
+    }, { source = sessionId, entities = Flow.entities(sessionId) })
+
+    TriggerClientEvent(OPEN_EVENT, sessionId, 'selection')
     return
   end
 
@@ -54,8 +64,36 @@ RegisterNetEvent('siku_multicharacter:server:createCharacter', function(data)
   end
 
   local handover <const> = introAvailable()
+  local previous <const>, seconds <const> = Flow.enter(sessionId, 'entering')
+  local _, _, total <const> = Flow.get(sessionId)
 
+  Flow.chose(sessionId, row.id, true)
   Characters.enter(sessionId, row, handover)
+
+  Siku.log.audit('multicharacter.character_created', {
+    message = ('%s created %s %s, character %d of %d'):format(user.name, row.first_name, row.last_name, Characters.count(user.id), CharactersConfig.slots),
+    source = sessionId,
+    entities = { { type = 'player', id = sessionId, role = 'actor' } },
+    data = {
+      character = {
+        id = row.id,
+        firstName = row.first_name,
+        lastName = row.last_name,
+        dob = row.dob,
+        gender = row.gender,
+        height = row.height,
+        nationality = row.nationality,
+        birthplace = row.birthplace,
+        pedModel = row.ped_model,
+      },
+      slot = Characters.count(user.id),
+      slots = CharactersConfig.slots,
+      intro = handover,
+      creationSeconds = total,
+      appearanceSeconds = seconds,
+      previous = previous,
+    },
+  })
 
   if handover then
     exports[INTRO_RESOURCE]:Start(sessionId)

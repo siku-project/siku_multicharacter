@@ -27,6 +27,8 @@ Nui.on('identitySubmitted', function(data)
   Look.sendAllLimits(ped)
   Camera.playIntro(ped)
   Nui.show('appearance')
+
+  TriggerServerEvent('siku_multicharacter:server:stage', 'appearance')
 end)
 
 Nui.on('pedSelected', function(data)

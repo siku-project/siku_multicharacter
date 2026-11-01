@@ -14,6 +14,11 @@ CreateThread(function()
   TriggerServerEvent('siku_multicharacter:server:playerReady')
 end)
 
+RegisterNetEvent('siku_multicharacter:client:relog', function()
+  Nui.hide()
+  Stage.fadeOut()
+end)
+
 RegisterNetEvent('siku_multicharacter:client:open', function(screen)
   if screen == 'selection' then
     Selection.open()
