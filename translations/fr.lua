@@ -7,6 +7,8 @@ return {
   error_session_never_started = "La session réseau n'a jamais démarré.",
   error_screen_never_faded = "L'écran n'est jamais passé au noir.",
   error_collision_never_loaded = "Les collisions n'ont jamais fini de charger.",
+  relog_title = 'Personnages',
+  relog_no_character = "Tu n'as pas de personnage en jeu.",
 
   web = {
     ['selection_tagline'] = 'Choisissez votre histoire',

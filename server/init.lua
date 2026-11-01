@@ -1,4 +1,4 @@
-local REQUIRED_CORE_VERSION <const> = '1.6.2'
+local REQUIRED_CORE_VERSION <const> = '1.7.0'
 
 local dependency <const> = Siku.version.checkDependency('siku_core', REQUIRED_CORE_VERSION)
 
