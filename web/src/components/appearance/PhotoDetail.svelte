@@ -8,7 +8,6 @@
   } from '@/lib/multicharacter/appearance/catalog'
   import { detailControls, photosControl } from '@/lib/multicharacter/appearance/photos'
   import { store } from '@/lib/multicharacter/store.svelte'
-  import { catalogPhoto } from '@/lib/multicharacter/types'
 
   let {
     stepId,
@@ -26,18 +25,13 @@
     onupdate: (key: string, value: number) => void
   } = $props()
 
-  let broken = $state<string | null>(null)
-
   const keyOf = (control: AppearanceControl): string => controlKey(stepId, category.id, control.id)
   const control = $derived(photosControl(category, store.catalog, pedModel))
   const details = $derived(detailControls(category))
   const value = $derived(control ? (draft[keyOf(control)] ?? control.min ?? 1) : 1)
-  const src = $derived(
-    control ? catalogPhoto(store.catalog, control.photos ?? '', pedModel, value - 1) : undefined,
-  )
 </script>
 
-{#if control}
+{#if control && details.length > 0}
   <Surface
     elevated={!inline}
     level={inline ? 'raised' : 'base'}
@@ -49,25 +43,6 @@
         <span class="t-subheading">{tr(control.label)}</span>
         <span class="t-caption text-fg-tertiary">{value} / {control.max ?? 1}</span>
       </div>
-
-      <Surface
-        level="sunken"
-        padding="none"
-        radius="lg"
-        class="mc-detail__photo flex items-center justify-center self-center overflow-hidden"
-      >
-        {#if src && broken !== src}
-          <img
-            class="h-full w-full object-contain"
-            {src}
-            alt=""
-            draggable="false"
-            onerror={() => (broken = src)}
-          />
-        {:else}
-          <span class="t-figure-sm text-fg-disabled">{value}</span>
-        {/if}
-      </Surface>
 
       {#each details as detail (detail.id)}
         {#if detail.type === 'swatches'}
