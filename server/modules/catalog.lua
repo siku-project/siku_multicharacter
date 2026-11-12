@@ -76,28 +76,39 @@ end
 
 ---@param items table The files the CDN listed.
 ---@param target string The target name the photos start with.
----@param kind string 'component' (`hair_12_0.webp`) or 'overlay' (`beard_7.webp`).
----@return table photos { { drawable, url } }, by drawable.
+---@param kind string 'component' or 'prop' (`top_12_3.webp`: drawable 12, texture 3) or 'overlay' (`beard_7.webp`).
+---@return table photos The file ids by drawable (as a string key) then texture (one id per texture, '' where a photo is missing).
+---@return number count How many photos were found.
 local function photosOf(items, target, kind)
-  local pattern <const> = (kind == 'overlay' and '^%s_(%%d+)%%.webp$' or '^%s_(%%d+)_0%%.webp$'):format(target)
+  local pattern <const> = (kind == 'overlay' and '^%s_(%%d+)%%.webp$' or '^%s_(%%d+)_(%%d+)%%.webp$'):format(target)
   local photos <const> = {}
+  local count = 0
 
   for i = 1, #items do
     local item <const> = items[i]
-    local drawable <const> = item.kind == 'file' and type(item.name) == 'string' and item.name:match(pattern) or nil
+    local name <const> = item.kind == 'file' and type(item.name) == 'string' and item.name or ''
+    local drawable <const>, texture <const> = name:match(pattern)
 
-    if drawable and type(item.url) == 'string' then
-      local url <const> = item.url:match('^https?://') and item.url or (CatalogConfig.cdn.url .. item.url)
+    if drawable and type(item.id) == 'string' then
+      local ids = photos[drawable]
 
-      photos[#photos + 1] = { drawable = tonumber(drawable), url = url }
+      if not ids then
+        ids = {}
+        photos[drawable] = ids
+      end
+
+      local slot <const> = (tonumber(texture) or 0) + 1
+
+      for empty = #ids + 1, slot - 1 do
+        ids[empty] = ''
+      end
+
+      ids[slot] = item.id
+      count = count + 1
     end
   end
 
-  table.sort(photos, function(a, b)
-    return a.drawable < b.drawable
-  end)
-
-  return photos
+  return photos, count
 end
 
 ---@return table|nil photos By target then model, nil when nothing could be listed.
@@ -111,12 +122,12 @@ local function listAll()
       local result <const> = list(path)
 
       if result.ok then
-        local entries <const> = photosOf(result.items, target, kind)
+        local entries <const>, found <const> = photosOf(result.items, target, kind)
 
-        if #entries > 0 then
+        if found > 0 then
           photos[target] = photos[target] or {}
           photos[target][model] = entries
-          count = count + #entries
+          count = count + found
         end
       else
         failures = failures + 1
@@ -183,6 +194,8 @@ local function describe()
   if not base.photos then
     return nil, true
   end
+
+  base.url = CatalogConfig.cdn.url
 
   return base
 end

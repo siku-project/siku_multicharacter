@@ -1,7 +1,8 @@
 import type { IconName } from '@siku/ui'
 import type { MessageKey } from '@/lib/i18n.svelte'
 
-export type AppearanceControlType = 'select' | 'slider' | 'swatches' | 'blend' | 'sprite' | 'photos'
+export type AppearanceControlType =
+  'select' | 'slider' | 'swatches' | 'blend' | 'sprite' | 'photos' | 'variants'
 
 export interface AppearanceControl {
   id: string
@@ -901,7 +902,8 @@ const CLOTHING_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlJacketStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'top',
         min: 1,
         max: 61,
         unit: '/ 61',
@@ -910,7 +912,8 @@ const CLOTHING_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlJacketVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 8,
         unit: '/ 8',
@@ -926,7 +929,8 @@ const CLOTHING_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlTshirtStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'undershirt',
         min: 1,
         max: 111,
         unit: '/ 111',
@@ -935,7 +939,8 @@ const CLOTHING_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlTshirtVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 12,
         unit: '/ 12',
@@ -951,7 +956,8 @@ const CLOTHING_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlArmsStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'arms',
         min: 1,
         max: 17,
         unit: '/ 17',
@@ -960,7 +966,8 @@ const CLOTHING_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlArmsVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 6,
         unit: '/ 6',
@@ -976,7 +983,8 @@ const CLOTHING_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlPantsStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'pants',
         min: 1,
         max: 98,
         unit: '/ 98',
@@ -985,7 +993,8 @@ const CLOTHING_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlPantsVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 10,
         unit: '/ 10',
@@ -1001,7 +1010,8 @@ const CLOTHING_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlShoesStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'shoes',
         min: 1,
         max: 77,
         unit: '/ 77',
@@ -1010,7 +1020,8 @@ const CLOTHING_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlShoesVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 10,
         unit: '/ 10',
@@ -1029,7 +1040,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlMaskStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'mask',
         min: 1,
         max: 53,
         unit: '/ 53',
@@ -1038,7 +1050,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlMaskVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 8,
         unit: '/ 8',
@@ -1054,7 +1067,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlBackpackStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'bag',
         min: 1,
         max: 40,
         unit: '/ 40',
@@ -1063,7 +1077,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlBackpackVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 6,
         unit: '/ 6',
@@ -1079,7 +1094,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlHatStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'hat',
         min: 1,
         max: 91,
         unit: '/ 91',
@@ -1088,7 +1104,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlHatVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 8,
         unit: '/ 8',
@@ -1104,7 +1121,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlGlassesStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'glasses',
         min: 1,
         max: 41,
         unit: '/ 41',
@@ -1113,7 +1131,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlGlassesVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 10,
         unit: '/ 10',
@@ -1129,7 +1148,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlEarringsStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'earrings',
         min: 1,
         max: 31,
         unit: '/ 31',
@@ -1138,7 +1158,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlEarringsVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 4,
         unit: '/ 4',
@@ -1154,7 +1175,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlWatchStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'watch',
         min: 1,
         max: 27,
         unit: '/ 27',
@@ -1163,7 +1185,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlWatchVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 6,
         unit: '/ 6',
@@ -1179,7 +1202,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlBraceletStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'bracelet',
         min: 1,
         max: 19,
         unit: '/ 19',
@@ -1188,7 +1212,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlBraceletVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 4,
         unit: '/ 4',
@@ -1204,7 +1229,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'model',
         label: 'appearance_ctrlNeckwearStyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'neck',
         min: 1,
         max: 43,
         unit: '/ 43',
@@ -1213,7 +1239,8 @@ const ACCESSORY_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'variant',
         label: 'appearance_ctrlNeckwearVariant',
-        type: 'slider',
+        type: 'variants',
+        detail: true,
         min: 1,
         max: 6,
         unit: '/ 6',

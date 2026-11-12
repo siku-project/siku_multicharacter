@@ -28,14 +28,17 @@ describe('store', () => {
           source: 'cdn',
           targets: { hair: 'component' },
           folders: { mp_m_freemode_01: 'male' },
-          photos: { hair: { mp_m_freemode_01: [{ drawable: 3, url: 'https://cdn/x.webp' }] } },
+          url: 'https://cdn',
+          photos: { hair: { mp_m_freemode_01: { 3: ['x'] } } },
         },
       }),
     ).toBe(true)
     expect(store.catalog.source).toBe('cdn')
     expect(catalogShows(store.catalog, 'hair', 'mp_m_freemode_01')).toBe(true)
     expect(catalogShows(store.catalog, 'hair', 'mp_f_freemode_01')).toBe(false)
-    expect(catalogPhoto(store.catalog, 'hair', 'mp_m_freemode_01', 3)).toBe('https://cdn/x.webp')
+    expect(catalogPhoto(store.catalog, 'hair', 'mp_m_freemode_01', 3)).toBe(
+      'https://cdn/media/x/hair_3_0.webp',
+    )
     expect(catalogPhoto(store.catalog, 'hair', 'mp_m_freemode_01', 4)).toBeUndefined()
 
     store.applyMessage({

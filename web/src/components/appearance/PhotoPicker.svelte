@@ -6,6 +6,7 @@
     count,
     value,
     columns = 4,
+    none,
     photo,
     onchange,
   }: {
@@ -13,6 +14,7 @@
     count: number
     value: number
     columns?: number
+    none?: string
     photo: (index: number) => string | undefined
     onchange: (index: number) => void
   } = $props()
@@ -22,6 +24,8 @@
   const id = `mc-photos-${Math.random().toString(36).slice(2, 8)}`
   let root = $state<HTMLDivElement | null>(null)
   let broken = $state<Record<number, boolean>>({})
+
+  const isNone = (index: number): boolean => !!none && index === 1
 
   const pick = (index: number): void => {
     if (index < 1 || index > count || index === value) {
@@ -63,12 +67,12 @@
   >
     {#each { length: count } as _, i (i)}
       {@const index = i + 1}
-      {@const src = broken[index] ? undefined : photo(index)}
+      {@const src = isNone(index) || broken[index] ? undefined : photo(index)}
       <button
         type="button"
         role="radio"
         aria-checked={index === value}
-        aria-label="{label} {index}"
+        aria-label={isNone(index) ? none : `${label} ${index}`}
         tabindex={index === value ? 0 : -1}
         class="mc-photo"
         class:is-selected={index === value}
@@ -83,6 +87,8 @@
             draggable="false"
             onerror={() => (broken[index] = true)}
           />
+        {:else if isNone(index)}
+          <span class="mc-photo__empty t-body-sm">{none}</span>
         {:else}
           <span class="mc-photo__empty t-subheading">{index}</span>
         {/if}
