@@ -18,7 +18,7 @@ describe('appearance catalogue', () => {
       'tattoos',
       'summary',
     ])
-    expect(stepById('physical')?.categories?.length).toBe(14)
+    expect(stepById('physical')?.categories?.length).toBe(16)
   })
 
   it('seeds every control with its default or its midpoint', () => {
