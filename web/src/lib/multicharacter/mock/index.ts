@@ -23,6 +23,9 @@ const CATALOG_TARGETS: Record<string, CatalogKind> = {
   eyebrows: 'overlay',
   beard: 'overlay',
   chest_hair: 'overlay',
+  lipstick: 'overlay',
+  makeup: 'overlay',
+  blush: 'overlay',
 }
 const CATALOG_FOLDERS: Record<string, string> = {
   mp_m_freemode_01: 'male',
@@ -33,6 +36,9 @@ const CATALOG_LIMITS: Record<string, string> = {
   eyebrows: 'eyebrows',
   beard: 'beard',
   chest_hair: 'chestHair',
+  lipstick: 'lipstick',
+  makeup: 'makeup',
+  blush: 'blush',
 }
 
 /** The catalogue as config/catalog.lua describes it with source = 'files'. */
