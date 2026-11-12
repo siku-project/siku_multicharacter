@@ -63,16 +63,22 @@ export interface CatalogPhoto {
 
 export type CatalogSource = 'none' | 'cdn' | 'files'
 
+export type CatalogKind = 'component' | 'overlay'
+
 /** How the editor finds the photo of an item: links listed from the CDN, or files shipped under a folder of the interface. */
 export interface Catalog {
   source: CatalogSource
-  targets: string[]
+  targets: Record<string, CatalogKind>
   folders: Record<string, string>
   folder?: string
   photos?: Record<string, Record<string, CatalogPhoto[]>>
 }
 
-export const NO_CATALOG: Catalog = { source: 'none', targets: [], folders: {} }
+export const NO_CATALOG: Catalog = { source: 'none', targets: {}, folders: {} }
+
+/** The file name of a photo, as siku_studio writes it: `hair_12_0.webp` for a component, `beard_7.webp` for an overlay. */
+export const catalogFileName = (target: string, kind: CatalogKind, drawable: number): string =>
+  kind === 'overlay' ? `${target}_${drawable}.webp` : `${target}_${drawable}_0.webp`
 
 export const isScreen = (value: unknown): value is Screen =>
   typeof value === 'string' && (SCREENS as readonly string[]).includes(value)
@@ -89,7 +95,9 @@ export const isCatalog = (value: unknown): value is Catalog => {
 
   return (
     (catalog.source === 'cdn' || catalog.source === 'files') &&
-    Array.isArray(catalog.targets) &&
+    !!catalog.targets &&
+    typeof catalog.targets === 'object' &&
+    !Array.isArray(catalog.targets) &&
     !!catalog.folders &&
     typeof catalog.folders === 'object'
   )
@@ -102,7 +110,9 @@ export const catalogPhoto = (
   model: string,
   drawable: number,
 ): string | undefined => {
-  if (!catalog.targets.includes(target)) {
+  const kind = catalog.targets[target]
+
+  if (!kind) {
     return undefined
   }
 
@@ -110,7 +120,7 @@ export const catalogPhoto = (
     const folder = catalog.folders[model]
 
     return folder && catalog.folder
-      ? `${catalog.folder}/${target}/${folder}/${target}_${drawable}_0.webp`
+      ? `${catalog.folder}/${target}/${folder}/${catalogFileName(target, kind, drawable)}`
       : undefined
   }
 
@@ -123,7 +133,7 @@ export const catalogPhoto = (
 
 /** Whether the catalogue has photos to show for a target on a model. */
 export const catalogShows = (catalog: Catalog, target: string, model: string): boolean => {
-  if (!catalog.targets.includes(target)) {
+  if (!catalog.targets[target]) {
     return false
   }
 

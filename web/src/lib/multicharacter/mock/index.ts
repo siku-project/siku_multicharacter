@@ -2,6 +2,7 @@ import { store } from '../store.svelte'
 import {
   NO_CATALOG,
   type Catalog,
+  type CatalogKind,
   type CatalogPhoto,
   type CharacterSummary,
   type HeritageConfig,
@@ -17,10 +18,21 @@ export const DEV_CDN_KEY = 'siku_multicharacter:dev:cdnKey'
 
 export type DevPhotos = 'none' | 'files' | 'cdn'
 
-const CATALOG_TARGETS = ['hair']
+const CATALOG_TARGETS: Record<string, CatalogKind> = {
+  hair: 'component',
+  eyebrows: 'overlay',
+  beard: 'overlay',
+  chest_hair: 'overlay',
+}
 const CATALOG_FOLDERS: Record<string, string> = {
   mp_m_freemode_01: 'male',
   mp_f_freemode_01: 'female',
+}
+const CATALOG_LIMITS: Record<string, string> = {
+  hair: 'hairStyles',
+  eyebrows: 'eyebrows',
+  beard: 'beard',
+  chest_hair: 'chestHair',
 }
 
 /** The catalogue as config/catalog.lua describes it with source = 'files'. */
@@ -44,11 +56,14 @@ interface CdnItem {
  */
 export const listCdnCatalog = async (key: string): Promise<number> => {
   const photos: Record<string, Record<string, CatalogPhoto[]>> = {}
+  const limits: Record<string, number> = {}
   let count = 0
-  let styles = 0
 
-  for (const target of CATALOG_TARGETS) {
-    const pattern = new RegExp(`^${target}_(\\d+)_0\\.webp$`)
+  for (const [target, kind] of Object.entries(CATALOG_TARGETS)) {
+    const pattern = new RegExp(
+      kind === 'overlay' ? `^${target}_(\\d+)\\.webp$` : `^${target}_(\\d+)_0\\.webp$`,
+    )
+    const limit = CATALOG_LIMITS[target]
 
     for (const [model, folder] of Object.entries(CATALOG_FOLDERS)) {
       const path = encodeURIComponent(`/${target}/${folder}`)
@@ -75,7 +90,12 @@ export const listCdnCatalog = async (key: string): Promise<number> => {
         entries.sort((a, b) => a.drawable - b.drawable)
         photos[target] = { ...photos[target], [model]: entries }
         count += entries.length
-        styles = Math.max(styles, (entries[entries.length - 1]?.drawable ?? 0) + 1)
+
+        if (limit) {
+          const last = (entries[entries.length - 1]?.drawable ?? 0) + 1
+
+          limits[limit] = Math.max(limits[limit] ?? 0, last)
+        }
       }
     }
   }
@@ -85,10 +105,7 @@ export const listCdnCatalog = async (key: string): Promise<number> => {
       ? { source: 'cdn', targets: CATALOG_TARGETS, folders: CATALOG_FOLDERS, photos }
       : NO_CATALOG,
   )
-
-  if (styles > 0) {
-    store.setAppearanceLimits({ hairStyles: styles })
-  }
+  store.setAppearanceLimits(limits)
 
   return count
 }

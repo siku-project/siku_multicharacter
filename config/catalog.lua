@@ -55,10 +55,15 @@ CatalogConfig = {
   },
 
   --- The targets shown as photos, by the name siku_studio gives them
-  --- (the `name` of each target in its `catalog.targets`). Only the
-  --- first texture of each drawable is shown: the editor picks the shape,
-  --- the colour comes from the swatches.
+  --- (the `name` of each target in its `catalog.targets`) with their
+  --- kind, which names the photos: a component photo is
+  --- `hair_12_0.webp` (drawable 12, texture 0, the only texture shown:
+  --- the editor picks the shape, the colour comes from the swatches), an
+  --- overlay photo is `beard_7.webp` (overlay value 7).
   targets = {
-    'hair',
+    hair = 'component',
+    eyebrows = 'overlay',
+    beard = 'overlay',
+    chest_hair = 'overlay',
   },
 }
