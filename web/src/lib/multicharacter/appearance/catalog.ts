@@ -1,7 +1,7 @@
 import type { IconName } from '@siku/ui'
 import type { MessageKey } from '@/lib/i18n.svelte'
 
-export type AppearanceControlType = 'select' | 'slider' | 'swatches' | 'blend' | 'sprite'
+export type AppearanceControlType = 'select' | 'slider' | 'swatches' | 'blend' | 'sprite' | 'photos'
 
 export interface AppearanceControl {
   id: string
@@ -19,6 +19,8 @@ export interface AppearanceControl {
   defaultValue?: number
   sprite?: 'eyeColour'
   spriteColumns?: number
+  photos?: string
+  detail?: boolean
 }
 
 export interface AppearanceCategory {
@@ -259,18 +261,26 @@ const PHYSICAL_CATEGORIES: AppearanceCategory[] = [
       {
         id: 'style',
         label: 'appearance_ctrlHairstyle',
-        type: 'slider',
+        type: 'photos',
+        photos: 'hair',
         min: 1,
         max: 38,
         unit: '/ 38',
         defaultValue: 1,
       },
-      { id: 'color', label: 'appearance_ctrlColor', type: 'swatches', colors: HAIR_COLORS },
+      {
+        id: 'color',
+        label: 'appearance_ctrlColor',
+        type: 'swatches',
+        colors: HAIR_COLORS,
+        detail: true,
+      },
       {
         id: 'highlights',
         label: 'appearance_ctrlHighlights',
         type: 'swatches',
         colors: HAIR_COLORS,
+        detail: true,
       },
     ],
   },

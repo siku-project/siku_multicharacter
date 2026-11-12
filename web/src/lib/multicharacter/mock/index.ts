@@ -1,8 +1,123 @@
 import { store } from '../store.svelte'
-import type { CharacterSummary, HeritageConfig, PedsConfig, SelectionConfig } from '../types'
+import {
+  NO_CATALOG,
+  type Catalog,
+  type CatalogPhoto,
+  type CharacterSummary,
+  type HeritageConfig,
+  type PedsConfig,
+  type SelectionConfig,
+} from '../types'
 import type { IdentityDraft } from '../identity'
 
 const DAY = 86_400_000
+
+export const DEV_PHOTOS_KEY = 'siku_multicharacter:dev:photos'
+export const DEV_CDN_KEY = 'siku_multicharacter:dev:cdnKey'
+
+export type DevPhotos = 'none' | 'files' | 'cdn'
+
+const CATALOG_TARGETS = ['hair']
+const CATALOG_FOLDERS: Record<string, string> = {
+  mp_m_freemode_01: 'male',
+  mp_f_freemode_01: 'female',
+}
+
+/** The catalogue as config/catalog.lua describes it with source = 'files'. */
+export const MOCK_FILES_CATALOG: Catalog = {
+  source: 'files',
+  targets: CATALOG_TARGETS,
+  folders: CATALOG_FOLDERS,
+  folder: 'images/catalog',
+}
+
+interface CdnItem {
+  kind: string
+  name: string
+  url: string | null
+}
+
+/**
+ * Lists the photos the way the server does, through the dev proxy that
+ * forwards /cdn to the Siku CDN, and shows them in the editor. Resolves
+ * to the number of photos found.
+ */
+export const listCdnCatalog = async (key: string): Promise<number> => {
+  const photos: Record<string, Record<string, CatalogPhoto[]>> = {}
+  let count = 0
+  let styles = 0
+
+  for (const target of CATALOG_TARGETS) {
+    const pattern = new RegExp(`^${target}_(\\d+)_0\\.webp$`)
+
+    for (const [model, folder] of Object.entries(CATALOG_FOLDERS)) {
+      const path = encodeURIComponent(`/${target}/${folder}`)
+      const response = await fetch(`/cdn/api/v1/files?folder=${path}`, {
+        headers: { Authorization: `Bearer ${key}` },
+      })
+
+      if (!response.ok) {
+        throw new Error(`${target}/${folder}: HTTP ${response.status}`)
+      }
+
+      const listing = (await response.json()) as { items?: CdnItem[] }
+      const entries: CatalogPhoto[] = []
+
+      for (const item of listing.items ?? []) {
+        const match = item.kind === 'file' ? pattern.exec(item.name) : null
+
+        if (match && item.url) {
+          entries.push({ drawable: Number(match[1]), url: `/cdn${item.url}` })
+        }
+      }
+
+      if (entries.length > 0) {
+        entries.sort((a, b) => a.drawable - b.drawable)
+        photos[target] = { ...photos[target], [model]: entries }
+        count += entries.length
+        styles = Math.max(styles, (entries[entries.length - 1]?.drawable ?? 0) + 1)
+      }
+    }
+  }
+
+  store.setCatalog(
+    count > 0
+      ? { source: 'cdn', targets: CATALOG_TARGETS, folders: CATALOG_FOLDERS, photos }
+      : NO_CATALOG,
+  )
+
+  if (styles > 0) {
+    store.setAppearanceLimits({ hairStyles: styles })
+  }
+
+  return count
+}
+
+export const devPhotos = (): DevPhotos => {
+  const stored = window.localStorage.getItem(DEV_PHOTOS_KEY)
+
+  return stored === 'none' || stored === 'cdn' ? stored : 'files'
+}
+
+export const devCdnKey = (): string => window.localStorage.getItem(DEV_CDN_KEY) ?? ''
+
+/** Picks where the editor reads its photos from in the browser, and remembers it. */
+export const applyDevPhotos = async (mode: DevPhotos, key = devCdnKey()): Promise<number> => {
+  window.localStorage.setItem(DEV_PHOTOS_KEY, mode)
+  window.localStorage.setItem(DEV_CDN_KEY, key)
+
+  if (mode === 'files') {
+    store.setCatalog(MOCK_FILES_CATALOG)
+    return 0
+  }
+
+  if (mode === 'cdn' && key) {
+    return listCdnCatalog(key)
+  }
+
+  store.setCatalog(NO_CATALOG)
+  return 0
+}
 
 export const MOCK_SELECTION_CONFIG: SelectionConfig = {
   slots: 5,
@@ -132,4 +247,8 @@ export const loadMocks = (): void => {
   store.setPedsConfig(MOCK_PEDS)
   store.setHeritageConfig(MOCK_HERITAGE)
   store.setAppearanceLimits({ hairStyles: 38, eyebrows: 34, beard: 29, jacketModel: 61 })
+
+  void applyDevPhotos(devPhotos()).catch((error: unknown) => {
+    console.warn('[dev] catalogue photos:', (error as Error).message)
+  })
 }

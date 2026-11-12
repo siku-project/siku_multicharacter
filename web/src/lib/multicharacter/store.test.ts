@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { MOCK_CHARACTERS, MOCK_HERITAGE, MOCK_PEDS, MOCK_SELECTION_CONFIG } from './mock'
 import { store } from './store.svelte'
+import { catalogPhoto, catalogShows } from './types'
 
 const action = (name: string) => `siku_multicharacter:nui:${name}`
 
@@ -17,6 +18,43 @@ describe('store', () => {
     expect(store.screen).toBe('selection')
     store.applyMessage({ action: action('hide') })
     expect(store.screen).toBe('hidden')
+  })
+
+  it('keeps the catalogue the game describes, sliders otherwise', () => {
+    expect(
+      store.applyMessage({
+        action: action('setCatalog'),
+        catalog: {
+          source: 'cdn',
+          targets: ['hair'],
+          folders: { mp_m_freemode_01: 'male' },
+          photos: { hair: { mp_m_freemode_01: [{ drawable: 3, url: 'https://cdn/x.webp' }] } },
+        },
+      }),
+    ).toBe(true)
+    expect(store.catalog.source).toBe('cdn')
+    expect(catalogShows(store.catalog, 'hair', 'mp_m_freemode_01')).toBe(true)
+    expect(catalogShows(store.catalog, 'hair', 'mp_f_freemode_01')).toBe(false)
+    expect(catalogPhoto(store.catalog, 'hair', 'mp_m_freemode_01', 3)).toBe('https://cdn/x.webp')
+    expect(catalogPhoto(store.catalog, 'hair', 'mp_m_freemode_01', 4)).toBeUndefined()
+
+    store.applyMessage({
+      action: action('setCatalog'),
+      catalog: {
+        source: 'files',
+        targets: ['hair'],
+        folders: { mp_f_freemode_01: 'female' },
+        folder: 'images/catalog',
+      },
+    })
+    expect(catalogPhoto(store.catalog, 'hair', 'mp_f_freemode_01', 12)).toBe(
+      'images/catalog/hair/female/hair_12_0.webp',
+    )
+    expect(catalogShows(store.catalog, 'beard', 'mp_f_freemode_01')).toBe(false)
+
+    store.applyMessage({ action: action('setCatalog'), catalog: { source: 'elsewhere' } })
+    expect(store.catalog.source).toBe('none')
+    expect(catalogShows(store.catalog, 'hair', 'mp_f_freemode_01')).toBe(false)
   })
 
   it('stores the roster with its configuration', () => {
