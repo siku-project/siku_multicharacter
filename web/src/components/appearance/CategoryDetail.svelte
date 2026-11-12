@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { Divider, Slider, SpritePicker, SwatchPicker } from '@siku/ui'
+  import { Divider, Slider, SpritePicker, SwatchPicker, scaleState } from '@siku/ui'
   import eyeColourSheet from '@/assets/mp-eye-colour.webp'
+  import PhotoDetail from '@/components/appearance/PhotoDetail.svelte'
+  import PhotoPicker from '@/components/appearance/PhotoPicker.svelte'
   import PortraitPicker from '@/components/appearance/PortraitPicker.svelte'
   import { m, tr } from '@/lib/i18n.svelte'
   import {
@@ -8,17 +10,21 @@
     type AppearanceCategory,
     type AppearanceControl,
   } from '@/lib/multicharacter/appearance/catalog'
+  import { photosControl } from '@/lib/multicharacter/appearance/photos'
   import { store } from '@/lib/multicharacter/store.svelte'
+  import { catalogPhoto, catalogShows } from '@/lib/multicharacter/types'
 
   let {
     stepId,
     category,
     draft,
+    pedModel,
     onupdate,
   }: {
     stepId: string
     category: AppearanceCategory
     draft: Record<string, number>
+    pedModel: string
     onupdate: (key: string, value: number) => void
   } = $props()
 
@@ -26,9 +32,20 @@
 
   const keyOf = (control: AppearanceControl): string => controlKey(stepId, category.id, control.id)
   const portraits = $derived(category.controls.filter((control) => control.portrait))
-  const controls = $derived(category.controls.filter((control) => !control.portrait))
+  const shown = $derived(photosControl(category, store.catalog, pedModel))
+  const controls = $derived(
+    category.controls.filter((control) => !control.portrait && !(shown && control.detail)),
+  )
   const parentsOf = (control: AppearanceControl) =>
     control.id === 'father' ? store.heritageConfig.fathers : store.heritageConfig.mothers
+
+  const showsPhotos = (control: AppearanceControl): boolean =>
+    control.type === 'photos' &&
+    !!control.photos &&
+    catalogShows(store.catalog, control.photos, pedModel)
+
+  const photoOf = (control: AppearanceControl, index: number): string | undefined =>
+    catalogPhoto(store.catalog, control.photos ?? '', pedModel, index - 1)
 
   const format = (control: AppearanceControl, value: number): string => {
     if (control.type === 'blend') {
@@ -77,6 +94,14 @@
         value={draft[keyOf(control)] ?? 0}
         onchange={(index) => onupdate(keyOf(control), index)}
       />
+    {:else if showsPhotos(control)}
+      <PhotoPicker
+        label={tr(control.label)}
+        count={control.max ?? 1}
+        value={draft[keyOf(control)] ?? control.min ?? 1}
+        photo={(index) => photoOf(control, index)}
+        onchange={(index) => onupdate(keyOf(control), index)}
+      />
     {:else}
       <Slider
         label={tr(control.label)}
@@ -92,6 +117,10 @@
       />
     {/if}
   {/each}
+
+  {#if shown && $scaleState.density === 'compact'}
+    <PhotoDetail inline {stepId} {category} {draft} {pedModel} {onupdate} />
+  {/if}
 
   {#if portraits.length === 0 && controls.length === 0}
     <span class="t-body-sm text-fg-tertiary">{m.appearance_nothingHere()}</span>

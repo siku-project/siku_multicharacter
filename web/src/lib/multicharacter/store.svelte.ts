@@ -1,11 +1,14 @@
 import { RESOURCE } from '@/lib/nui'
 import type { IdentityDraft } from './identity'
 import {
+  NO_CATALOG,
+  isCatalog,
   isHeritageConfig,
   isLimits,
   isPedsConfig,
   isScreen,
   type AppearanceLimits,
+  type Catalog,
   type CharacterSummary,
   type HeritageConfig,
   type PedsConfig,
@@ -28,6 +31,7 @@ let pedsConfig = $state<PedsConfig>({
 })
 let heritageConfig = $state<HeritageConfig>({ fathers: [], mothers: [] })
 let appearanceLimits = $state<AppearanceLimits>({})
+let catalog = $state<Catalog>(NO_CATALOG)
 
 interface NuiMessage {
   action?: unknown
@@ -37,6 +41,7 @@ interface NuiMessage {
   peds?: unknown
   heritage?: unknown
   limits?: unknown
+  catalog?: unknown
 }
 
 const action = (name: string): string => `${RESOURCE}:nui:${name}`
@@ -64,6 +69,9 @@ export const store = {
   get appearanceLimits(): AppearanceLimits {
     return appearanceLimits
   },
+  get catalog(): Catalog {
+    return catalog
+  },
 
   setScreen(next: Screen): void {
     screen = next
@@ -88,6 +96,9 @@ export const store = {
   },
   setAppearanceLimits(next: AppearanceLimits): void {
     appearanceLimits = { ...appearanceLimits, ...next }
+  },
+  setCatalog(next: Catalog): void {
+    catalog = next
   },
 
   /** Applies a message from the game. Returns false when the message is not one of ours. */
@@ -129,6 +140,9 @@ export const store = {
         if (isLimits(message.limits)) {
           appearanceLimits = { ...appearanceLimits, ...message.limits }
         }
+        return true
+      case action('setCatalog'):
+        catalog = isCatalog(message.catalog) ? message.catalog : NO_CATALOG
         return true
       default:
         return false

@@ -51,6 +51,28 @@ function Look.sendLimits(limits)
   Nui.send('setLimits', { limits = limits })
 end
 
+local catalogSent = false
+
+--- Hands the interface the catalogue photos, once per session: the
+--- server lists them from the CDN or names the folder they ship in, and
+--- nothing is sent when the editor keeps its sliders.
+function Look.sendCatalog()
+  if catalogSent then
+    return
+  end
+
+  CreateThread(function()
+    local ok <const>, catalog = Siku.callback.triggerServer('siku_multicharacter:callback:catalog')
+
+    if not ok or type(catalog) ~= 'table' then
+      return
+    end
+
+    catalogSent = true
+    Nui.send('setCatalog', { catalog = catalog })
+  end)
+end
+
 ---@param ped number The ped handle.
 function Look.sendAllLimits(ped)
   local limits <const> = {}
