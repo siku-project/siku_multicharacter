@@ -1,12 +1,13 @@
 <script lang="ts">
   import { Surface, SwatchPicker } from '@siku/ui'
+  import PhotoPicker from '@/components/appearance/PhotoPicker.svelte'
   import { tr } from '@/lib/i18n.svelte'
   import {
     controlKey,
     type AppearanceCategory,
     type AppearanceControl,
   } from '@/lib/multicharacter/appearance/catalog'
-  import { detailControls, photosControl } from '@/lib/multicharacter/appearance/photos'
+  import { detailControls, photoAt, photosControl } from '@/lib/multicharacter/appearance/photos'
   import { store } from '@/lib/multicharacter/store.svelte'
 
   let {
@@ -29,6 +30,9 @@
   const control = $derived(photosControl(category, store.catalog, pedModel))
   const details = $derived(detailControls(category))
   const value = $derived(control ? (draft[keyOf(control)] ?? control.min ?? 1) : 1)
+
+  const variantPhoto = (index: number): string | undefined =>
+    control ? photoAt(store.catalog, control, pedModel, value, index - 1) : undefined
 </script>
 
 {#if control && details.length > 0}
@@ -51,6 +55,14 @@
             label={tr(detail.label)}
             colors={detail.colors ?? []}
             value={draft[keyOf(detail)] ?? 0}
+            onchange={(index) => onupdate(keyOf(detail), index)}
+          />
+        {:else if detail.type === 'variants'}
+          <PhotoPicker
+            label={tr(detail.label)}
+            count={detail.max ?? 1}
+            value={draft[keyOf(detail)] ?? detail.min ?? 1}
+            photo={variantPhoto}
             onchange={(index) => onupdate(keyOf(detail), index)}
           />
         {/if}

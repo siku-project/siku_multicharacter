@@ -221,6 +221,7 @@ return {
     ['appearance_ctrlShoesVariant'] = 'Shoes variant',
     ['appearance_ctrlTattoo'] = 'Tattoo',
     ['appearance_photo'] = 'Photo',
+    ['appearance_none'] = 'None',
     ['appearance_sumIdentity'] = 'Identity',
     ['appearance_sumCharacter'] = 'Character',
     ['appearance_tipPan'] = 'Left click',

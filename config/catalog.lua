@@ -1,10 +1,11 @@
 --- The photos of the catalogue: siku_studio photographs every item on
 --- both freemode models and names each photo after what it shows
---- (`hair_12_0.webp`: hair drawable 12, texture 0), filed in one folder
---- per target with one folder per model inside (`hair/male/`). When
+--- (`top_12_3.webp`: top drawable 12, texture 3), filed in one folder
+--- per target with one folder per model inside (`top/male/`). When
 --- `images` is on, the appearance editor shows those photos as a grid
---- instead of a slider for the targets listed below; off, it keeps its
---- sliders.
+--- instead of a slider for the targets listed below, and the textures
+--- of the chosen clothing or accessory as a second grid beside the
+--- panel when it has more than one; off, it keeps its sliders.
 CatalogConfig = {
   --- Whether the editor shows photos at all.
   ---
@@ -56,10 +57,12 @@ CatalogConfig = {
 
   --- The targets shown as photos, by the name siku_studio gives them
   --- (the `name` of each target in its `catalog.targets`) with their
-  --- kind, which names the photos: a component photo is
-  --- `hair_12_0.webp` (drawable 12, texture 0, the only texture shown:
-  --- the editor picks the shape, the colour comes from the swatches), an
-  --- overlay photo is `beard_7.webp` (overlay value 7).
+  --- kind, which names the photos: a component or prop photo is
+  --- `top_12_3.webp` (drawable 12, texture 3; the grid shows the first
+  --- texture of each drawable, the variants grid every texture of the
+  --- chosen one, and the hair only its first texture since its colour
+  --- comes from the swatches), an overlay photo is `beard_7.webp`
+  --- (overlay value 7). The first slot of a prop stands for none.
   targets = {
     hair = 'component',
     eyebrows = 'overlay',
@@ -68,5 +71,18 @@ CatalogConfig = {
     lipstick = 'overlay',
     makeup = 'overlay',
     blush = 'overlay',
+    top = 'component',
+    undershirt = 'component',
+    arms = 'component',
+    pants = 'component',
+    shoes = 'component',
+    mask = 'component',
+    bag = 'component',
+    neck = 'component',
+    hat = 'prop',
+    glasses = 'prop',
+    earrings = 'prop',
+    watch = 'prop',
+    bracelet = 'prop',
   },
 }

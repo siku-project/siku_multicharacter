@@ -10,9 +10,14 @@
     type AppearanceCategory,
     type AppearanceControl,
   } from '@/lib/multicharacter/appearance/catalog'
-  import { photosControl } from '@/lib/multicharacter/appearance/photos'
+  import {
+    photoAt,
+    photosControl,
+    startsWithNone,
+    variantControls,
+  } from '@/lib/multicharacter/appearance/photos'
   import { store } from '@/lib/multicharacter/store.svelte'
-  import { catalogPhoto, catalogShows } from '@/lib/multicharacter/types'
+  import { catalogShows } from '@/lib/multicharacter/types'
 
   let {
     stepId,
@@ -45,7 +50,17 @@
     catalogShows(store.catalog, control.photos, pedModel)
 
   const photoOf = (control: AppearanceControl, index: number): string | undefined =>
-    catalogPhoto(store.catalog, control.photos ?? '', pedModel, index - 1)
+    photoAt(store.catalog, control, pedModel, index)
+
+  const change = (control: AppearanceControl, value: number): void => {
+    onupdate(keyOf(control), value)
+
+    if (control.type === 'photos') {
+      for (const variants of variantControls(category)) {
+        onupdate(keyOf(variants), variants.min ?? 1)
+      }
+    }
+  }
 
   const format = (control: AppearanceControl, value: number): string => {
     if (control.type === 'blend') {
@@ -99,8 +114,9 @@
         label={tr(control.label)}
         count={control.max ?? 1}
         value={draft[keyOf(control)] ?? control.min ?? 1}
+        none={startsWithNone(store.catalog, control) ? m.appearance_none() : undefined}
         photo={(index) => photoOf(control, index)}
-        onchange={(index) => onupdate(keyOf(control), index)}
+        onchange={(index) => change(control, index)}
       />
     {:else}
       <Slider
@@ -113,7 +129,7 @@
         minLabel={control.minLabel ? tr(control.minLabel) : undefined}
         maxLabel={control.maxLabel ? tr(control.maxLabel) : undefined}
         format={(value) => format(control, value)}
-        onchange={(value) => onupdate(keyOf(control), value)}
+        onchange={(value) => change(control, value)}
       />
     {/if}
   {/each}

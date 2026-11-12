@@ -3,7 +3,7 @@ import {
   NO_CATALOG,
   type Catalog,
   type CatalogKind,
-  type CatalogPhoto,
+  type CatalogListing,
   type CharacterSummary,
   type HeritageConfig,
   type PedsConfig,
@@ -26,6 +26,19 @@ const CATALOG_TARGETS: Record<string, CatalogKind> = {
   lipstick: 'overlay',
   makeup: 'overlay',
   blush: 'overlay',
+  top: 'component',
+  undershirt: 'component',
+  arms: 'component',
+  pants: 'component',
+  shoes: 'component',
+  mask: 'component',
+  bag: 'component',
+  neck: 'component',
+  hat: 'prop',
+  glasses: 'prop',
+  earrings: 'prop',
+  watch: 'prop',
+  bracelet: 'prop',
 }
 const CATALOG_FOLDERS: Record<string, string> = {
   mp_m_freemode_01: 'male',
@@ -39,6 +52,19 @@ const CATALOG_LIMITS: Record<string, string> = {
   lipstick: 'lipstick',
   makeup: 'makeup',
   blush: 'blush',
+  top: 'jacketModel',
+  undershirt: 'tshirtModel',
+  arms: 'armsGlovesModel',
+  pants: 'pantsModel',
+  shoes: 'shoesModel',
+  mask: 'maskModel',
+  bag: 'backpackModel',
+  neck: 'neckwearModel',
+  hat: 'hatModel',
+  glasses: 'glassesModel',
+  earrings: 'earringsModel',
+  watch: 'watchModel',
+  bracelet: 'braceletModel',
 }
 
 /** The catalogue as config/catalog.lua describes it with source = 'files'. */
@@ -50,9 +76,9 @@ export const MOCK_FILES_CATALOG: Catalog = {
 }
 
 interface CdnItem {
+  id: string
   kind: string
   name: string
-  url: string | null
 }
 
 /**
@@ -61,15 +87,16 @@ interface CdnItem {
  * to the number of photos found.
  */
 export const listCdnCatalog = async (key: string): Promise<number> => {
-  const photos: Record<string, Record<string, CatalogPhoto[]>> = {}
+  const photos: Record<string, Record<string, CatalogListing>> = {}
   const limits: Record<string, number> = {}
   let count = 0
 
   for (const [target, kind] of Object.entries(CATALOG_TARGETS)) {
     const pattern = new RegExp(
-      kind === 'overlay' ? `^${target}_(\\d+)\\.webp$` : `^${target}_(\\d+)_0\\.webp$`,
+      kind === 'overlay' ? `^${target}_(\\d+)\\.webp$` : `^${target}_(\\d+)_(\\d+)\\.webp$`,
     )
     const limit = CATALOG_LIMITS[target]
+    const offset = kind === 'prop' ? 2 : 1
 
     for (const [model, folder] of Object.entries(CATALOG_FOLDERS)) {
       const path = encodeURIComponent(`/${target}/${folder}`)
@@ -82,25 +109,34 @@ export const listCdnCatalog = async (key: string): Promise<number> => {
       }
 
       const listing = (await response.json()) as { items?: CdnItem[] }
-      const entries: CatalogPhoto[] = []
+      const entries: CatalogListing = {}
+      let found = 0
+      let last = -1
 
       for (const item of listing.items ?? []) {
         const match = item.kind === 'file' ? pattern.exec(item.name) : null
 
-        if (match && item.url) {
-          entries.push({ drawable: Number(match[1]), url: `/cdn${item.url}` })
+        if (match) {
+          const drawable = Number(match[1])
+          const texture = match[2] ? Number(match[2]) : 0
+          const ids = (entries[drawable] ??= [])
+
+          while (ids.length < texture) {
+            ids.push('')
+          }
+
+          ids[texture] = item.id
+          found += 1
+          last = Math.max(last, drawable)
         }
       }
 
-      if (entries.length > 0) {
-        entries.sort((a, b) => a.drawable - b.drawable)
+      if (found > 0) {
         photos[target] = { ...photos[target], [model]: entries }
-        count += entries.length
+        count += found
 
         if (limit) {
-          const last = (entries[entries.length - 1]?.drawable ?? 0) + 1
-
-          limits[limit] = Math.max(limits[limit] ?? 0, last)
+          limits[limit] = Math.max(limits[limit] ?? 0, last + offset)
         }
       }
     }
@@ -108,7 +144,7 @@ export const listCdnCatalog = async (key: string): Promise<number> => {
 
   store.setCatalog(
     count > 0
-      ? { source: 'cdn', targets: CATALOG_TARGETS, folders: CATALOG_FOLDERS, photos }
+      ? { source: 'cdn', targets: CATALOG_TARGETS, folders: CATALOG_FOLDERS, url: '/cdn', photos }
       : NO_CATALOG,
   )
   store.setAppearanceLimits(limits)
