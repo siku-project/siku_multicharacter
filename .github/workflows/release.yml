@@ -27,7 +27,7 @@ jobs:
       - name: Assemble package
         run: |
           mkdir -p package/siku_multicharacter/web
-          cp -r client server shared config translations fxmanifest.lua README.md package/siku_multicharacter/
+          cp -r client server config translations fxmanifest.lua README.md package/siku_multicharacter/
           cp -r web/dist package/siku_multicharacter/web/dist
           cd package
           zip -r ../siku_multicharacter.zip siku_multicharacter
