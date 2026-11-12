@@ -65,5 +65,8 @@ CatalogConfig = {
     eyebrows = 'overlay',
     beard = 'overlay',
     chest_hair = 'overlay',
+    lipstick = 'overlay',
+    makeup = 'overlay',
+    blush = 'overlay',
   },
 }
