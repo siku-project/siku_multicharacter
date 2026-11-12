@@ -76,9 +76,10 @@ end
 
 ---@param items table The files the CDN listed.
 ---@param target string The target name the photos start with.
+---@param kind string 'component' (`hair_12_0.webp`) or 'overlay' (`beard_7.webp`).
 ---@return table photos { { drawable, url } }, by drawable.
-local function photosOf(items, target)
-  local pattern <const> = ('^%s_(%%d+)_0%%.webp$'):format(target)
+local function photosOf(items, target, kind)
+  local pattern <const> = (kind == 'overlay' and '^%s_(%%d+)%%.webp$' or '^%s_(%%d+)_0%%.webp$'):format(target)
   local photos <const> = {}
 
   for i = 1, #items do
@@ -104,13 +105,13 @@ local function listAll()
   local photos <const> = {}
   local count, failures = 0, 0
 
-  for _, target in ipairs(CatalogConfig.targets) do
+  for target, kind in pairs(CatalogConfig.targets) do
     for model in pairs(CatalogConfig.folders) do
       local path <const> = folderPath(target, model)
       local result <const> = list(path)
 
       if result.ok then
-        local entries <const> = photosOf(result.items, target)
+        local entries <const> = photosOf(result.items, target, kind)
 
         if #entries > 0 then
           photos[target] = photos[target] or {}

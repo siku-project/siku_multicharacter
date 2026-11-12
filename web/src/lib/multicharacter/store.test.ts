@@ -26,7 +26,7 @@ describe('store', () => {
         action: action('setCatalog'),
         catalog: {
           source: 'cdn',
-          targets: ['hair'],
+          targets: { hair: 'component' },
           folders: { mp_m_freemode_01: 'male' },
           photos: { hair: { mp_m_freemode_01: [{ drawable: 3, url: 'https://cdn/x.webp' }] } },
         },
@@ -42,7 +42,7 @@ describe('store', () => {
       action: action('setCatalog'),
       catalog: {
         source: 'files',
-        targets: ['hair'],
+        targets: { hair: 'component', beard: 'overlay' },
         folders: { mp_f_freemode_01: 'female' },
         folder: 'images/catalog',
       },
@@ -50,7 +50,16 @@ describe('store', () => {
     expect(catalogPhoto(store.catalog, 'hair', 'mp_f_freemode_01', 12)).toBe(
       'images/catalog/hair/female/hair_12_0.webp',
     )
-    expect(catalogShows(store.catalog, 'beard', 'mp_f_freemode_01')).toBe(false)
+    expect(catalogPhoto(store.catalog, 'beard', 'mp_f_freemode_01', 7)).toBe(
+      'images/catalog/beard/female/beard_7.webp',
+    )
+    expect(catalogShows(store.catalog, 'eyebrows', 'mp_f_freemode_01')).toBe(false)
+
+    store.applyMessage({
+      action: action('setCatalog'),
+      catalog: { source: 'files', targets: ['hair'], folders: {}, folder: 'images/catalog' },
+    })
+    expect(store.catalog.source).toBe('none')
 
     store.applyMessage({ action: action('setCatalog'), catalog: { source: 'elsewhere' } })
     expect(store.catalog.source).toBe('none')
