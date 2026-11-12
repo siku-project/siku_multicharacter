@@ -1,9 +1,19 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
-  import { Button, Chip, Divider, Select, Steps, Surface, type StepItem } from '@siku/ui'
+  import {
+    Button,
+    Chip,
+    Divider,
+    Select,
+    Steps,
+    Surface,
+    scaleState,
+    type StepItem,
+  } from '@siku/ui'
   import CameraTips from '@/components/appearance/CameraTips.svelte'
   import CategoryDetail from '@/components/appearance/CategoryDetail.svelte'
+  import PhotoDetail from '@/components/appearance/PhotoDetail.svelte'
   import SummaryStep from '@/components/appearance/SummaryStep.svelte'
   import Brand from '@/components/shared/Brand.svelte'
   import Progress from '@/components/shared/Progress.svelte'
@@ -237,7 +247,13 @@
               {:else if step.id === 'summary'}
                 <SummaryStep {draft} {pedModel} />
               {:else if limited}
-                <CategoryDetail stepId={step.id} category={limited} {draft} onupdate={update} />
+                <CategoryDetail
+                  stepId={step.id}
+                  category={limited}
+                  {draft}
+                  {pedModel}
+                  onupdate={update}
+                />
               {/if}
             </div>
           {/key}
@@ -259,4 +275,10 @@
       </section>
     </div>
   </Surface>
+
+  {#if limited && $scaleState.density === 'regular'}
+    {#key `${step.id}-${activeCategoryId}`}
+      <PhotoDetail stepId={step.id} category={limited} {draft} {pedModel} onupdate={update} />
+    {/key}
+  {/if}
 </div>

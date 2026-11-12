@@ -25,6 +25,7 @@ Nui.on('identitySubmitted', function(data)
   local ped <const> = Stage.place(MODEL_BY_GENDER[data.gender] or MODEL_BY_GENDER.male, nil)
 
   Look.sendAllLimits(ped)
+  Look.sendCatalog()
   Camera.playIntro(ped)
   Nui.show('appearance')
 

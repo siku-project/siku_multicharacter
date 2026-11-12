@@ -30,6 +30,13 @@ export default defineConfig({
     headers: {
       'Cache-Control': 'no-cache',
     },
+    proxy: {
+      '/cdn': {
+        target: 'https://cdn.heliony.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/cdn/, ''),
+      },
+    },
   },
   build: {
     outDir: 'dist',
