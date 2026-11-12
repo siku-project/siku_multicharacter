@@ -221,6 +221,7 @@ return {
     ['appearance_ctrlShoesVariant'] = 'Variante de chaussures',
     ['appearance_ctrlTattoo'] = 'Tatouage',
     ['appearance_photo'] = 'Photo',
+    ['appearance_none'] = 'Aucun',
     ['appearance_sumIdentity'] = 'Identité',
     ['appearance_sumCharacter'] = 'Personnage',
     ['appearance_tipPan'] = 'Clic gauche',

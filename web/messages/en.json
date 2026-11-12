@@ -107,6 +107,7 @@
   "appearance_groupFace": "Face",
   "appearance_groupHairiness": "Hair",
   "appearance_groupSkin": "Skin",
+  "appearance_none": "None",
   "appearance_nothingHere": "Nothing to adjust here.",
   "appearance_pedFemale": "Female",
   "appearance_pedHelp": "Male and Female can be fully customised; other models keep their look.",
